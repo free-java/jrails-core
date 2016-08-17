@@ -1,0 +1,87 @@
+<?xml version="1.0" ?>
+<project name="jrails-core" default="build" basedir=".">
+	<property environment="env" />
+	<property name="jr.charset" value="UTF-8" />
+	<property name="jr.root" location="../" />
+	<property name="jr.docs" value="${jr.root}/public/docs" />
+	<property name="jr.src" value="${jr.root}/WEB-INF/src" />
+	<property name="jr.lib" value="${jr.root}/WEB-INF/lib" />
+	<property name="jr.build" value="${jr.root}/WEB-INF/build" />
+	<property name="jr.classes" value="${jr.root}/WEB-INF/classes" />
+	<property name="jr.core.jar" value="${jr.build}/${ant.project.name}-1.0.jar" />
+	<property name="jr.war" value="/tmp/${ant.project.name}.war" />
+	<property name="jr.tomcat.webapps" value="/usr/local/src/lib/tomcat/default/webapps/" />
+	<path id="classpath">
+		<fileset dir="${jr.lib}">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+	<target name="clear">
+		<delete dir="${jr.build}" />
+		<delete dir="${jr.classes}" />
+		<delete dir="${jr.docs}" />
+		<delete dir="${jr.tomcat.webapps}/core/" />
+		<mkdir dir="${jr.build}" />
+		<mkdir dir="${jr.build}/classes" />
+		<mkdir dir="${jr.classes}" />
+		<mkdir dir="${jr.docs}" />
+	</target>
+	<target name="compile" depends="clear">
+		<javac debug="true" includeAntRuntime="false" destdir="${jr.classes}" encoding="${jr.charset}" nowarn="true">
+			<src>
+				<pathelement location="${jr.src}" />
+			</src>
+			<compilerarg line="-Xlint:-unchecked -Xlint:-deprecation"/>
+			<compilerarg value="-Xlint:none"/>
+			<classpath refid="classpath" />
+		</javac>
+	</target>
+	<target name="package" depends="compile">
+		<jar jarfile="${jr.build}/app.jar">
+			<fileset dir="${jr.classes}">
+				<include name="app/**/**/*" />
+			</fileset>
+		</jar>
+		<jar jarfile="${jr.core.jar}">
+			<fileset dir="${jr.classes}">
+				<include name="net/rails/**/*" />
+			</fileset>
+		</jar>
+	</target>
+	<target name="cdocs">
+		<javadoc destdir="${jr.docs}" encoding="${jr.charset}" docencoding="${jr.charset}" charset="${jr.charset}" maxmemory="512M" useexternalfile="yes">
+			<fileset dir="${jr.src}">
+				<include name="net/rails/**/*" />
+			</fileset>
+		</javadoc>
+	</target>
+	<target name="makewar" depends="package">
+		<war warfile="${jr.war}" webxml="${jr.root}/WEB-INF/web.xml">
+			<lib dir="${jr.lib}">
+				<include name="**" />
+			</lib>
+			<fileset dir="${jr.root}" >
+			    <exclude name="WEB-INF/src/" />
+			    <exclude name="WEB-INF/doc/" />
+				<exclude name="WEB-INF/log/" />
+				<exclude name="WEB-INF/build/" />
+			</fileset>
+		</war>
+	</target>
+	<target name="deploy.remote">
+	    <scp file="${jr.war}" sftp="true" trust="true" todir="root:password@172.16.187.135:${jr.tomcat.webapps}" />
+	</target>
+	<target name="deploy.local">
+		<copy file="${jr.war}" todir="${jr.tomcat.webapps}"/>
+	</target>
+	<target name="build">
+		<ant target="makewar" />
+		<ant target="deploy.remote" />
+		<!-- 
+		<ant target="deploy.local" />
+		<ant target="deploy.remote" />
+		<ant target="cdocs" />
+		 -->
+	</target>
+
+</project>

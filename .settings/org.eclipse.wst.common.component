@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="jrails-core">
+        <wb-resource deploy-path="/" source-path="/" tag="defaultRootSource"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/WEB-INF/src"/>
+        <property name="context-root" value="jrails-core"/>
+        <property name="java-output-path" value="/jrails-core/bin"/>
+    </wb-module>
+</project-modules>
