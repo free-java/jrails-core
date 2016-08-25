@@ -49,15 +49,18 @@ public class Adapter {
 	protected String prefix;
 	protected Map<String,Object> modcnf;	
 	protected Map<String,Object> dbcnf;
+	protected boolean autoCommit = true;
 	
 	protected static Map<String,Map<String,String>> COLUMN_TYPES;
 	protected static Map<String,Map<String,String>> COLUMN_CLASSES;
 	protected static Map<String,List<String>> COLUMN_NAMES;
+	protected static Map<String,Connection> CONNECTIONS;
 	
 	static{
 		COLUMN_TYPES = new IndexMap<String,Map<String,String>>();
 		COLUMN_CLASSES = new IndexMap<String,Map<String,String>>();
 		COLUMN_NAMES = new IndexMap<String,List<String>>();
+		CONNECTIONS = new HashMap<String,Connection>();
 	}
 	
 	public Adapter(Map<String,Object> dbcnf,String model) {
@@ -408,7 +411,17 @@ public class Adapter {
 		return dataSource;
 	}
 	
+	public void setAutoCommit(boolean autoCommit){
+		this.autoCommit = autoCommit;
+	}
+	
+    public boolean isAutoCommit(){
+		return autoCommit;
+	}
+	
 	protected void open() throws SQLException{		
+//		if(this.connection.getAutoCommit())
+//			this.connection.setAutoCommit(false);
 		boolean initConn = (connection == null || connection.isClosed());
 		if(initConn){
 			log.debug("Open Connection");
