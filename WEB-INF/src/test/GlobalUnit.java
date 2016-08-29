@@ -6,7 +6,7 @@ import net.rails.support.worker.AbsConfigWorker;
 public class GlobalUnit extends AbsGlobal {
 	
 	static{
-		AbsConfigWorker.CONFIG_PATH = "./config";
+		AbsConfigWorker.CONFIG_PATH = String.format("%s/WEB-INF/config",System.getProperty("user.dir"));
 	}
 	
 	private Object userId;
@@ -47,7 +47,7 @@ public class GlobalUnit extends AbsGlobal {
 
 	@Override
 	public String getRealPath() {
-		return "./";
+		return String.format("%s/WEB-INF",System.getProperty("user.dir"));
 	}
 
 }

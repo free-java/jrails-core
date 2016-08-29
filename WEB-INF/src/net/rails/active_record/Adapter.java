@@ -15,8 +15,6 @@ import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-//import org.apache.log4j.Logger;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -39,8 +37,6 @@ public class Adapter {
 	private Logger log = LoggerFactory.getLogger(Adapter.class);	
 	private DataSource dataSource;
 
-	protected PreparedStatement statement;
-	protected Connection connection;
 	protected String model;
 	protected String tableName;
 	protected String primaryKey;
@@ -50,17 +46,20 @@ public class Adapter {
 	protected Map<String,Object> modcnf;	
 	protected Map<String,Object> dbcnf;
 	protected boolean autoCommit = true;
+	protected Long threadId;
 	
 	protected static Map<String,Map<String,String>> COLUMN_TYPES;
 	protected static Map<String,Map<String,String>> COLUMN_CLASSES;
 	protected static Map<String,List<String>> COLUMN_NAMES;
-	protected static Map<String,Connection> CONNECTIONS;
+	protected static Map<Long,Connection> CONNECTIONS;
+	protected static Map<Long,Connection> QUERY_CONNECTIONS;
 	
 	static{
 		COLUMN_TYPES = new IndexMap<String,Map<String,String>>();
 		COLUMN_CLASSES = new IndexMap<String,Map<String,String>>();
 		COLUMN_NAMES = new IndexMap<String,List<String>>();
-		CONNECTIONS = new HashMap<String,Connection>();
+		CONNECTIONS = new HashMap<Long,Connection>();
+		QUERY_CONNECTIONS = new HashMap<Long,Connection>();
 	}
 	
 	public Adapter(Map<String,Object> dbcnf,String model) {
@@ -72,6 +71,7 @@ public class Adapter {
 	
 	private void init() {
 		initDataSource();
+		threadId = Thread.currentThread().getId();
 		modcnf = Support.config().getModels().get(model);
 		schema = Support.map(dbcnf).get("schema","");
 		pluralized = Support.map(dbcnf).get("pluralized",false);
@@ -91,7 +91,7 @@ public class Adapter {
 		}
 	}
 	
-	protected void bindValues(List<Object> params) throws SQLException {
+	protected void bindValues(PreparedStatement statement,List<Object> params) throws SQLException {
 		for (int i = 0; i < params.size(); i++) {
 			if (params.get(i) != null){
 				Object v = params.get(i);
@@ -159,19 +159,22 @@ public class Adapter {
 	
 	private List<Map<String,Object>> findSql(SqlWorker sql) throws SQLException{
 		Map<String, Object> row = null;
+		ResultSet result = null;
+		PreparedStatement statement = null;
+		Connection connection = null;		
 		List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
 		try{
 			if(log.isDebugEnabled()){
 				log.debug("Find sql for : " + sql.getSql());
 				log.debug("Params for : " + sql.getParams());	
 			}
-			open();
-			statement = this.connection.prepareStatement(sql.getSql());
-			if(sql.getMaxRows() > 0)
+		    connection = queryOpen();
+			statement = connection.prepareStatement(sql.getSql());
+			if(sql.getMaxRows() > 0){
 				statement.setMaxRows(sql.getMaxRows());
-			
-			bindValues(sql.getParams());
-			final ResultSet result = statement.executeQuery();
+			}
+			bindValues(statement,sql.getParams());
+			result = statement.executeQuery();
 			final ResultSetMetaData rsmd = result.getMetaData();
 			final int c = rsmd.getColumnCount();
 			while (result.next()) {
@@ -181,18 +184,19 @@ public class Adapter {
 				}
 				rows.add(row);
 			}
-			result.close();
 			if(log.isDebugEnabled()){
 				log.debug("Rows : " + rows.size());
 				log.debug("Result(DB) : " + rows);
 			}
 			return rows;
 		}finally{
-			close();
+			queryClose(result,statement,connection);
 		}
 	}
 	
 	public boolean create(ActiveRecord record) throws SQLException{
+		PreparedStatement statement = null;
+		Connection connection = null;
 		try{
 			CreateWorker cw = Sql.create(record);
 			SqlWorker sql = Sql.sql(cw.getSql(),cw.params());
@@ -200,9 +204,9 @@ public class Adapter {
 				log.debug("Execute sql for : " + sql.getSql());
 				log.debug("Params for : " + sql.getParams());
 			}		
-			open();	
-			statement = this.connection.prepareStatement(sql.getSql(),new String[] {record.getWriterAdapter().getPrimaryKey()});
-			bindValues(sql.getParams());
+			connection = open();
+			statement = connection.prepareStatement(sql.getSql(),new String[] {record.getWriterAdapter().getPrimaryKey()});
+			bindValues(statement,sql.getParams());
 			final int r = statement.executeUpdate();
 			final ResultSet rs = statement.getGeneratedKeys();
 			if(rs.next()) {
@@ -219,6 +223,8 @@ public class Adapter {
 	
 	public <T extends ActiveRecord> int[] create(List<T> records) throws SQLException{
 		boolean first = true;
+		PreparedStatement statement = null;
+		Connection connection = null;
 		try{			
 			Timestamp curr = new Timestamp(new Date().getTime());
 			for(ActiveRecord record : records){
@@ -226,17 +232,17 @@ public class Adapter {
 				record.put("created_user_id",record.getGlobal().getUserId());
 				record.put("deleted", false);				
 				CreateWorker cw = Sql.create(record);
-				SqlWorker sql = Sql.sql(cw.getSql(),cw.params());								
-				if(first){
-					open();					
-					statement = this.connection.prepareStatement(sql.getSql(),new String[] {record.getWriterAdapter().getPrimaryKey()});
+				SqlWorker sql = Sql.sql(cw.getSql(),cw.params());	
+				if(first){		
+					connection = open();
+					statement = connection.prepareStatement(sql.getSql(),new String[] {record.getWriterAdapter().getPrimaryKey()});
 					first = false;
 				}
 				if(log.isDebugEnabled()){
 					log.debug("Execute sql for : " + sql.getSql());
 					log.debug("Params for : " + sql.getParams());
 				}
-				bindValues(sql.getParams());
+				bindValues(statement,sql.getParams());
 				statement.addBatch();
 			}
 			if(records.size() > 0)
@@ -251,14 +257,16 @@ public class Adapter {
 	}
 	
 	public int execute(SqlWorker sql) throws SQLException{
+		PreparedStatement statement = null;
+		Connection connection = null;
 		if(log.isDebugEnabled()){
 			log.debug("Execute sql for : " + sql.getSql());
 			log.debug("Params for : " + sql.getParams());
 		}		
 		try{
-			open();
+			connection = open();
 			statement = connection.prepareStatement(sql.getSql());
-			bindValues(sql.getParams());
+			bindValues(statement,sql.getParams());
 			return statement.executeUpdate();
 		}catch(SQLException e){
 			throw e;
@@ -268,17 +276,20 @@ public class Adapter {
 	}
 	
 	public List<String> getColumnNames() {
-		if(COLUMN_NAMES.containsKey(model))
+		ResultSet result = null;
+		PreparedStatement statement = null;
+		Connection connection = null;
+		if(COLUMN_NAMES.containsKey(model)){
 			return new ArrayList<String>(COLUMN_NAMES.get(model));
-		
-		if(log.isDebugEnabled())
+		}
+		if(log.isDebugEnabled()){
 			log.debug("Get Column names for " + model);	
-		
+		}
 		try{
-			open();
+			connection = queryOpen();
 			statement = connection.prepareStatement("SELECT * FROM " + quoteSchemaAndTableName() + " WHERE 1 = 0");
 			final List<String> list = new ArrayList<String>();
-			final ResultSet result = statement.executeQuery();
+			result = statement.executeQuery();
 			final ResultSetMetaData rsmd = result.getMetaData();
 			for (int i = 0; i < rsmd.getColumnCount(); i++) {
 				list.add(rsmd.getColumnLabel(i + 1).toLowerCase().trim());
@@ -290,63 +301,66 @@ public class Adapter {
 			log.error( e.getMessage(),e);
 			return null;
 		}finally{
-			close();
+			queryClose(result, statement, connection);
 		}		
 	}
 	
 	public Map<String,String> getColumnClasses() {	
+		ResultSet result = null;
+		PreparedStatement statement = null;
+		Connection connection = null;
 		if(COLUMN_CLASSES.containsKey(model))
 			return new HashMap<String,String>(COLUMN_CLASSES.get(model));
 		
-		if(log.isDebugEnabled())
+		if(log.isDebugEnabled()){
 			log.debug("Get column classes for " + model);
-		
+		}
 		final Map<String,String> types = new HashMap<String,String>();
 		try{
-			open();
+			connection = queryOpen();
 			statement = connection.prepareStatement("SELECT * FROM " + quoteSchemaAndTableName() + " WHERE 1 = 0");
-			final ResultSet result = statement.executeQuery();
+			result = statement.executeQuery();
 			final ResultSetMetaData rsmd = result.getMetaData();
 			for (int i = 0; i < rsmd.getColumnCount(); i++) {
 				String cn = rsmd.getColumnClassName(i + 1).replaceFirst("java.lang.","");
 				types.put(rsmd.getColumnLabel(i + 1).toLowerCase(),cn);
 			}
-			result.close();
 			COLUMN_CLASSES.put(model,types);
 			return getColumnClasses();
 		}catch(SQLException e){
 			log.error(e.getMessage(),e);
 			return null;
 		}finally{
-			close();
+			queryClose(result,statement,connection);
 		}
 	}
 	
 	public Map<String,String> getColumnTypes() {
+		ResultSet result = null;
+		PreparedStatement statement = null;
+		Connection connection = null;
 		if(COLUMN_TYPES.containsKey(model))
 			return new HashMap<String,String>(COLUMN_TYPES.get(model));
 		
-		if(log.isDebugEnabled())
+		if(log.isDebugEnabled()){
 			log.debug("Get column types for " + model);
-		
+		}
 		final Map<String,String> types = new HashMap<String,String>();
 		try{
-			open();
+			connection = queryOpen();
 			statement = connection.prepareStatement("SELECT * FROM " + quoteSchemaAndTableName() + " WHERE 1 = 0");
-			final ResultSet result = statement.executeQuery();
+			result = statement.executeQuery();
 			final ResultSetMetaData rsmd = result.getMetaData();
 			for (int i = 0; i < rsmd.getColumnCount(); i++) {
 				types.put(rsmd.getColumnLabel(i + 1), rsmd.getColumnTypeName(i + 1));
 			}
-			
-			result.close();
 			COLUMN_TYPES.put(model,types);
 			return getColumnTypes();
 		}catch(SQLException e){
 			log.error(e.getMessage(),e);
 			return null;
 		}finally{
-			close();
+			queryClose(result,statement,connection);
 		}
 	}
 	
@@ -419,20 +433,32 @@ public class Adapter {
 		return autoCommit;
 	}
 	
-	protected void open() throws SQLException{		
-//		if(this.connection.getAutoCommit())
-//			this.connection.setAutoCommit(false);
-		boolean initConn = (connection == null || connection.isClosed());
+	protected Connection open() throws SQLException{
+		log.debug("Open Connection");
+		Connection connection = CONNECTIONS.get(threadId);
+		boolean initConn = connection == null || connection.isClosed();
 		if(initConn){
-			log.debug("Open Connection");
 			connection = dataSource.getConnection();
-			connection.setAutoCommit(true);
+			connection.setAutoCommit(this.isAutoCommit());
+			CONNECTIONS.put(threadId, connection);
 		}
+		return CONNECTIONS.get(threadId);
 	}
 	
-	protected void close() {
+	protected Connection queryOpen() throws SQLException{		
+		log.debug("Open Connection");
+		Connection connection = dataSource.getConnection();
+		connection.setAutoCommit(true);
+		QUERY_CONNECTIONS.put(threadId, connection);
+		return QUERY_CONNECTIONS.get(threadId);
+	}
+	
+	protected void queryClose(ResultSet result,PreparedStatement statement,Connection connection) {
 		log.debug("Close Connection");
 		try{
+			if (result != null){
+				result.close();
+			}
 			if (statement != null){
 				statement.close();
 			}
@@ -441,6 +467,50 @@ public class Adapter {
 			}
 		}catch(SQLException e){
 			log.error(e.getMessage(),e);
+		}
+	}
+	
+	protected void close() {
+		if(autoCommit) {
+			log.debug("Close Connection");
+			Connection connection = CONNECTIONS.get(threadId);
+			try{
+				if (connection != null){
+					connection.close();
+				}
+			}catch(SQLException e){
+				log.error(e.getMessage(),e);
+			}finally{
+				CONNECTIONS.remove(threadId);
+			}
+		}
+	}
+	
+	protected void rollback() {
+		log.debug("Rollback Connection");
+		Connection connection = CONNECTIONS.get(threadId);
+		try{
+			if (connection != null){
+				connection.rollback();
+			}
+		}catch(SQLException e){
+			log.error(e.getMessage(),e);
+		}finally{
+			close();
+		}
+	}
+	
+	protected void commit() {
+		log.debug("Rollback Connection");
+		Connection connection = CONNECTIONS.get(threadId);
+		try{
+			if (connection != null){
+				connection.commit();
+			}
+		}catch(SQLException e){
+			log.error(e.getMessage(),e);
+		}finally{
+			close();
 		}
 	}
 	
