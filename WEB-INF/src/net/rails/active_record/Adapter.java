@@ -52,14 +52,12 @@ public class Adapter {
 	protected static Map<String,Map<String,String>> COLUMN_CLASSES;
 	protected static Map<String,List<String>> COLUMN_NAMES;
 	protected static Map<Long,Connection> CONNECTIONS;
-	protected static Map<Long,Connection> QUERY_CONNECTIONS;
 	
 	static{
 		COLUMN_TYPES = new IndexMap<String,Map<String,String>>();
 		COLUMN_CLASSES = new IndexMap<String,Map<String,String>>();
 		COLUMN_NAMES = new IndexMap<String,List<String>>();
 		CONNECTIONS = new HashMap<Long,Connection>();
-		QUERY_CONNECTIONS = new HashMap<Long,Connection>();
 	}
 	
 	public Adapter(Map<String,Object> dbcnf,String model) {
@@ -217,7 +215,9 @@ public class Adapter {
 		}catch(SQLException e){
 			throw e;
 		}finally{
-			close();
+			if(autoCommit) {
+				close();
+			}
 		}
 	}
 	
@@ -252,7 +252,9 @@ public class Adapter {
 		}catch(SQLException e){
 			throw e;
 		}finally{
-			close();
+			if(autoCommit) {
+				close();
+			}
 		}
 	}
 	
@@ -271,7 +273,9 @@ public class Adapter {
 		}catch(SQLException e){
 			throw e;
 		}finally{
-			close();
+			if(autoCommit) {
+				close();
+			}
 		}
 	}
 	
@@ -435,26 +439,33 @@ public class Adapter {
 	
 	protected Connection open() throws SQLException{
 		log.debug("Open Connection");
-		Connection connection = CONNECTIONS.get(threadId);
-		boolean initConn = connection == null || connection.isClosed();
-		if(initConn){
+		Connection connection = null;
+		if(isAutoCommit()){
 			connection = dataSource.getConnection();
-			connection.setAutoCommit(this.isAutoCommit());
+			connection.setAutoCommit(isAutoCommit());
 			CONNECTIONS.put(threadId, connection);
+			return connection;
+		}else{
+			if(CONNECTIONS.containsKey(threadId)){
+				return CONNECTIONS.get(threadId);
+			}else{
+				connection = dataSource.getConnection();
+				connection.setAutoCommit(isAutoCommit());
+				CONNECTIONS.put(threadId, connection);
+				return CONNECTIONS.get(threadId);
+			}
 		}
-		return CONNECTIONS.get(threadId);
 	}
 	
 	protected Connection queryOpen() throws SQLException{		
-		log.debug("Open Connection");
+		log.debug("Open Qyery Connection");
 		Connection connection = dataSource.getConnection();
 		connection.setAutoCommit(true);
-		QUERY_CONNECTIONS.put(threadId, connection);
-		return QUERY_CONNECTIONS.get(threadId);
+		return connection;
 	}
 	
 	protected void queryClose(ResultSet result,PreparedStatement statement,Connection connection) {
-		log.debug("Close Connection");
+		log.debug("Close Query Connection");
 		try{
 			if (result != null){
 				result.close();
@@ -471,26 +482,24 @@ public class Adapter {
 	}
 	
 	protected void close() {
-		if(autoCommit) {
-			log.debug("Close Connection");
-			Connection connection = CONNECTIONS.get(threadId);
-			try{
-				if (connection != null){
-					connection.close();
-				}
-			}catch(SQLException e){
-				log.error(e.getMessage(),e);
-			}finally{
-				CONNECTIONS.remove(threadId);
+		Connection connection = CONNECTIONS.get(threadId);
+		try{
+			if (connection != null){
+				log.debug("Close Connection");
+				connection.close();
 			}
+		}catch(SQLException e){
+			log.error(e.getMessage(),e);
+		}finally{
+			CONNECTIONS.remove(threadId);
 		}
 	}
 	
 	protected void rollback() {
-		log.debug("Rollback Connection");
 		Connection connection = CONNECTIONS.get(threadId);
 		try{
 			if (connection != null){
+				log.debug("Rollback Connection");
 				connection.rollback();
 			}
 		}catch(SQLException e){
@@ -501,10 +510,10 @@ public class Adapter {
 	}
 	
 	protected void commit() {
-		log.debug("Rollback Connection");
 		Connection connection = CONNECTIONS.get(threadId);
 		try{
 			if (connection != null){
+				log.debug("Commit Connection");
 				connection.commit();
 			}
 		}catch(SQLException e){

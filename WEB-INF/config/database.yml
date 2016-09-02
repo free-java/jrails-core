@@ -2,12 +2,12 @@ Development:
   family: Mysql
   username: "root"
   driver: 'org.gjt.mm.mysql.Driver'
-  password: "123456"
-  url: "jdbc:mysql://localhost:3306/core?characterEncoding=utf8"
+  password: "password"
+  url: "jdbc:mysql://localhost:3306/core_test?characterEncoding=utf8"
   datasource: org.apache.commons.dbcp.BasicDataSource
   quote: "`keyword`"
-  schema: "`core`"
-  prefix: table_perfix
+  schema: core_test
+#  prefix: table_perfix
   formats:
     datetime: 'yyyy-MM-dd HH:mm:ss.SSS'
     date: 'yyyy-MM-dd'
@@ -29,21 +29,21 @@ Development:
 #    date: 'yyyy-MM-dd'
 #    time: 'HH:mm:ss.SSS'
     
-Production: 
-  family: Mysql
-  username: "root"
-  driver: 'org.gjt.mm.mysql.Driver'
-  password: "password"
-  url: "jdbc:mysql://localhost:3306/core?characterEncoding=utf8"
-  datasource: org.apache.commons.dbcp.BasicDataSource
-  quote: "`keyword`"
-  schema: "core"
-#  prefix: 'table_'
-  pluralized: false
-  formats:
-    datetime: 'yyyy-MM-dd HH:mm:ss.SSS'
-    date: 'yyyy-MM-dd'
-    time: 'HH:mm:ss.SSS'
+#Production: 
+#  family: Mysql
+#  username: "root"
+#  driver: 'org.gjt.mm.mysql.Driver'
+#  password: "password"
+#  url: "jdbc:mysql://localhost:3306/core?characterEncoding=utf8"
+#  datasource: org.apache.commons.dbcp.BasicDataSource
+#  quote: "`keyword`"
+#  schema: "core"
+##  prefix: 'table_'
+#  pluralized: false
+#  formats:
+#    datetime: 'yyyy-MM-dd HH:mm:ss.SSS'
+#    date: 'yyyy-MM-dd'
+#    time: 'HH:mm:ss.SSS'
 
 
 #Sqlite: 

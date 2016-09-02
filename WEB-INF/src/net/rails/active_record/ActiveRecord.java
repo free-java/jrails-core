@@ -1176,15 +1176,25 @@ public abstract class ActiveRecord extends IndexMap<String, Object> {
 			return list.get(0);
 		}
 	}
-	
-	/**
-	 * Batch execute install or update or delete sql.
-	 * @param batchs List<ActiveRecord>
-	 * @return int[] Updated rows total.
-	 * @throws SQLException 处理失败抛出异常
-	 */
+
 	public static <T extends ActiveRecord> int[] createBatch(List<T> batchs) throws SQLException {		
 		return batchs.get(0).getWriterAdapter().create(batchs);
+	}
+	
+	public void setAutoCommit(boolean autoCommit){
+		writerAdapter.setAutoCommit(autoCommit);
+	}
+	
+	public boolean isAutoCommit(){
+		return writerAdapter.isAutoCommit();
+	}
+	
+	public void commit(){
+		writerAdapter.commit();
+	}
+	
+	public void rollback(){
+		writerAdapter.rollback();
 	}
     //End static methods
 	
