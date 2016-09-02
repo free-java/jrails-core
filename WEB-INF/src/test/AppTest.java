@@ -5,11 +5,16 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.URLDecoder;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Map;
 
 import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.time.DateUtils;
 
 import net.rails.active_record.Database;
 import net.rails.ciphertext.Ciphertext;
@@ -154,5 +159,14 @@ public class AppTest
 //    		e.printStackTrace();
 //    	}
 //    }
+	
+	
+	public void testDateAfter() throws ParseException{
+		SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd");
+		Date dateOfBound = DateUtils.truncate(f.parse("2016-08-24"), Calendar.DATE);
+		Date actDate = DateUtils.truncate(f.parse("2016-08-20"), Calendar.DATE);
+		System.out.println(dateOfBound.after(actDate));
+		System.out.println(dateOfBound.getTime() > actDate.getTime());
+	}
     
 }

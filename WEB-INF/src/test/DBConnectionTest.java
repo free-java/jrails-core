@@ -54,14 +54,20 @@ public class DBConnectionTest
     	try{
         	g.setLocale("default");
         	a = new Account(g);
-        	a.setAutoCommit(false);
-        	System.out.println(a.getAttributes());
-        	System.out.println(a);
+        	a.useTransaction();;
         	a.setId(Support.code().id());
         	a.put("name","jack");
         	a.put("age","22");
         	a.onSave();
-        	int i = 1/0;
+        	
+        	Account a1  = new Account(g);
+        	a1.useTransaction();
+        	a1.setId(Support.code().id());
+        	a1.put("name","jack 2");
+        	a1.put("age","33");
+        	a1.onSave();
+        	
+//        	int i = 1/0;
         	a.commit();
             assertTrue( true );
     	}catch(Exception e){

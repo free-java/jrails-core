@@ -166,7 +166,7 @@ public class Adapter {
 				log.debug("Find sql for : " + sql.getSql());
 				log.debug("Params for : " + sql.getParams());	
 			}
-		    connection = queryOpen();
+		    connection = openQueryConnection();
 			statement = connection.prepareStatement(sql.getSql());
 			if(sql.getMaxRows() > 0){
 				statement.setMaxRows(sql.getMaxRows());
@@ -188,7 +188,7 @@ public class Adapter {
 			}
 			return rows;
 		}finally{
-			queryClose(result,statement,connection);
+			closeQueryConnection(result,statement,connection);
 		}
 	}
 	
@@ -216,7 +216,7 @@ public class Adapter {
 		}catch(SQLException e){
 			throw e;
 		}finally{
-			notAutoCommitClose(statement,connection);
+			closeConnection(statement,connection);
 		}
 	}
 	
@@ -252,7 +252,7 @@ public class Adapter {
 		}catch(SQLException e){
 			throw e;
 		}finally{
-			notAutoCommitClose(statement,connection);
+			closeConnection(statement,connection);
 		}
 	}
 	
@@ -271,7 +271,7 @@ public class Adapter {
 		}catch(SQLException e){
 			throw e;
 		}finally{
-			notAutoCommitClose(statement,connection);
+			closeConnection(statement,connection);
 		}
 	}
 	
@@ -286,7 +286,7 @@ public class Adapter {
 			log.debug("Get Column names for " + model);	
 		}
 		try{
-			connection = queryOpen();
+			connection = openQueryConnection();
 			statement = connection.prepareStatement("SELECT * FROM " + quoteSchemaAndTableName() + " WHERE 1 = 0");
 			final List<String> list = new ArrayList<String>();
 			result = statement.executeQuery();
@@ -301,7 +301,7 @@ public class Adapter {
 			log.error( e.getMessage(),e);
 			return null;
 		}finally{
-			queryClose(result, statement, connection);
+			closeQueryConnection(result, statement, connection);
 		}		
 	}
 	
@@ -317,7 +317,7 @@ public class Adapter {
 		}
 		final Map<String,String> types = new HashMap<String,String>();
 		try{
-			connection = queryOpen();
+			connection = openQueryConnection();
 			statement = connection.prepareStatement("SELECT * FROM " + quoteSchemaAndTableName() + " WHERE 1 = 0");
 			result = statement.executeQuery();
 			final ResultSetMetaData rsmd = result.getMetaData();
@@ -331,7 +331,7 @@ public class Adapter {
 			log.error(e.getMessage(),e);
 			return null;
 		}finally{
-			queryClose(result,statement,connection);
+			closeQueryConnection(result,statement,connection);
 		}
 	}
 	
@@ -347,7 +347,7 @@ public class Adapter {
 		}
 		final Map<String,String> types = new HashMap<String,String>();
 		try{
-			connection = queryOpen();
+			connection = openQueryConnection();
 			statement = connection.prepareStatement("SELECT * FROM " + quoteSchemaAndTableName() + " WHERE 1 = 0");
 			result = statement.executeQuery();
 			final ResultSetMetaData rsmd = result.getMetaData();
@@ -360,7 +360,7 @@ public class Adapter {
 			log.error(e.getMessage(),e);
 			return null;
 		}finally{
-			queryClose(result,statement,connection);
+			closeQueryConnection(result,statement,connection);
 		}
 	}
 	
@@ -434,17 +434,18 @@ public class Adapter {
 	}
 	
 	private Connection open() throws SQLException{
-		log.debug("Open Connection");
 		Connection connection = null;
 		if(isAutoCommit()){
+			log.debug("Open Connection");
 			connection = dataSource.getConnection();
 			connection.setAutoCommit(isAutoCommit());
-			CONNECTIONS.put(threadId, connection);
 			return connection;
 		}else{
 			if(CONNECTIONS.containsKey(threadId)){
+				log.debug("Get Transaction Connection");
 				return CONNECTIONS.get(threadId);
 			}else{
+				log.debug("Open Transaction Connection");
 				connection = dataSource.getConnection();
 				connection.setAutoCommit(isAutoCommit());
 				CONNECTIONS.put(threadId, connection);
@@ -453,14 +454,14 @@ public class Adapter {
 		}
 	}
 	
-	private Connection queryOpen() throws SQLException{		
+	private Connection openQueryConnection() throws SQLException{		
 		log.debug("Open Qyery Connection");
 		Connection connection = dataSource.getConnection();
 		connection.setAutoCommit(true);
 		return connection;
 	}
 	
-	private void queryClose(ResultSet result,PreparedStatement statement,Connection connection) {
+	private void closeQueryConnection(ResultSet result,PreparedStatement statement,Connection connection) {
 		log.debug("Close Query Connection");
 		try{
 			if (result != null){
@@ -477,9 +478,9 @@ public class Adapter {
 		}
 	}
 	
-	private void notAutoCommitClose(PreparedStatement statement,Connection connection) {
-		log.debug("Close Not Auto Commit Connection");
+	private void closeConnection(PreparedStatement statement,Connection connection) {
 		if(isAutoCommit()){
+			log.debug("Close Connection");
 			try{
 				if (statement != null){
 					statement.close();
@@ -493,11 +494,11 @@ public class Adapter {
 		}
 	}
 	
-	private void close() {
+	private void closeTransactionConnection() {
 		Connection connection = CONNECTIONS.get(threadId);
 		try{
 			if (connection != null){
-				log.debug("Close Connection");
+				log.debug("Close Transaction Connection");
 				connection.close();
 			}
 		}catch(SQLException e){
@@ -517,7 +518,7 @@ public class Adapter {
 		}catch(SQLException e){
 			log.error(e.getMessage(),e);
 		}finally{
-			close();
+			closeTransactionConnection();
 		}
 	}
 	
@@ -531,7 +532,7 @@ public class Adapter {
 		}catch(SQLException e){
 			log.error(e.getMessage(),e);
 		}finally{
-			close();
+			closeTransactionConnection();
 		}
 	}
 	

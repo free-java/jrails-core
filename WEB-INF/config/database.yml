@@ -3,10 +3,10 @@ Development:
   username: "root"
   driver: 'org.gjt.mm.mysql.Driver'
   password: "password"
-  url: "jdbc:mysql://localhost:3306/core_test?characterEncoding=utf8"
+  url: "jdbc:mysql://localhost:3306/appdb?characterEncoding=utf8"
   datasource: org.apache.commons.dbcp.BasicDataSource
   quote: "`keyword`"
-  schema: core_test
+  schema: appdb
 #  prefix: table_perfix
   formats:
     datetime: 'yyyy-MM-dd HH:mm:ss.SSS'

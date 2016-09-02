@@ -1076,6 +1076,22 @@ public abstract class ActiveRecord extends IndexMap<String, Object> {
 	public Json<String,Object> toJson(){
 		return new Json<String, Object>(this);
 	}
+	
+	public void useTransaction(){
+		writerAdapter.setAutoCommit(false);
+	}
+	
+	public boolean isUseTransaction(){
+		return !writerAdapter.isAutoCommit();
+	}
+	
+	public void commit(){
+		writerAdapter.commit();
+	}
+	
+	public void rollback(){
+		writerAdapter.rollback();
+	}
 	//End public methods
 	
 	//Begin static methods
@@ -1181,21 +1197,6 @@ public abstract class ActiveRecord extends IndexMap<String, Object> {
 		return batchs.get(0).getWriterAdapter().create(batchs);
 	}
 	
-	public void setAutoCommit(boolean autoCommit){
-		writerAdapter.setAutoCommit(autoCommit);
-	}
-	
-	public boolean isAutoCommit(){
-		return writerAdapter.isAutoCommit();
-	}
-	
-	public void commit(){
-		writerAdapter.commit();
-	}
-	
-	public void rollback(){
-		writerAdapter.rollback();
-	}
     //End static methods
 	
 }
