@@ -15,6 +15,10 @@
 SET NAMES utf8;
 SET FOREIGN_KEY_CHECKS = 0;
 
+CREATE DATABASE appdb CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+USE appdb;
+
 -- ----------------------------
 --  Table structure for `account`
 -- ----------------------------
