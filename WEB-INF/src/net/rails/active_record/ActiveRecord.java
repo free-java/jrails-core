@@ -1081,6 +1081,10 @@ public abstract class ActiveRecord extends IndexMap<String, Object> {
 		writerAdapter.setAutoCommit(false);
 	}
 	
+	public void unUseTransaction(){
+		writerAdapter.setAutoCommit(true);
+	}
+	
 	public boolean isUseTransaction(){
 		return !writerAdapter.isAutoCommit();
 	}
@@ -1156,7 +1160,7 @@ public abstract class ActiveRecord extends IndexMap<String, Object> {
 	
 	/**
 	 * Execute "Select sql" function.
-	 * @param t is a ActiveRecord of sub class object.
+	 * @param t is an ActiveRecord of sub class object.
 	 * @param worker FindWorker.
 	 * @return List<T>.
 	 */ 
@@ -1172,7 +1176,7 @@ public abstract class ActiveRecord extends IndexMap<String, Object> {
 
 	/**
 	 * Execute "Select sql" function.
-	 * @param t is a ActiveRecord of sub class object.
+	 * @param t is an ActiveRecord of sub class object.
 	 * @param worker FindWorker
 	 * @return T.
 	 */
