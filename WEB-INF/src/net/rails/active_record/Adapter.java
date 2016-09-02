@@ -195,6 +195,7 @@ public class Adapter {
 	public boolean create(ActiveRecord record) throws SQLException{
 		PreparedStatement statement = null;
 		Connection connection = null;
+		ResultSet rs = null;
 		try{
 			CreateWorker cw = Sql.create(record);
 			SqlWorker sql = Sql.sql(cw.getSql(),cw.params());
@@ -206,7 +207,7 @@ public class Adapter {
 			statement = connection.prepareStatement(sql.getSql(),new String[] {record.getWriterAdapter().getPrimaryKey()});
 			bindValues(statement,sql.getParams());
 			final int r = statement.executeUpdate();
-			final ResultSet rs = statement.getGeneratedKeys();
+			rs = statement.getGeneratedKeys();
 			if(rs.next()) {
 				record.setId(rs.getObject(1));
 			}
@@ -215,9 +216,7 @@ public class Adapter {
 		}catch(SQLException e){
 			throw e;
 		}finally{
-			if(autoCommit) {
-				close();
-			}
+			notAutoCommitClose(statement,connection);
 		}
 	}
 	
@@ -245,16 +244,15 @@ public class Adapter {
 				bindValues(statement,sql.getParams());
 				statement.addBatch();
 			}
-			if(records.size() > 0)
+			if(records.size() > 0){
 				return statement.executeBatch();
-			else
+			}else{
 				return null;
+			}
 		}catch(SQLException e){
 			throw e;
 		}finally{
-			if(autoCommit) {
-				close();
-			}
+			notAutoCommitClose(statement,connection);
 		}
 	}
 	
@@ -273,9 +271,7 @@ public class Adapter {
 		}catch(SQLException e){
 			throw e;
 		}finally{
-			if(autoCommit) {
-				close();
-			}
+			notAutoCommitClose(statement,connection);
 		}
 	}
 	
@@ -437,7 +433,7 @@ public class Adapter {
 		return autoCommit;
 	}
 	
-	protected Connection open() throws SQLException{
+	private Connection open() throws SQLException{
 		log.debug("Open Connection");
 		Connection connection = null;
 		if(isAutoCommit()){
@@ -457,14 +453,14 @@ public class Adapter {
 		}
 	}
 	
-	protected Connection queryOpen() throws SQLException{		
+	private Connection queryOpen() throws SQLException{		
 		log.debug("Open Qyery Connection");
 		Connection connection = dataSource.getConnection();
 		connection.setAutoCommit(true);
 		return connection;
 	}
 	
-	protected void queryClose(ResultSet result,PreparedStatement statement,Connection connection) {
+	private void queryClose(ResultSet result,PreparedStatement statement,Connection connection) {
 		log.debug("Close Query Connection");
 		try{
 			if (result != null){
@@ -481,7 +477,23 @@ public class Adapter {
 		}
 	}
 	
-	protected void close() {
+	private void notAutoCommitClose(PreparedStatement statement,Connection connection) {
+		log.debug("Close Not Auto Commit Connection");
+		if(isAutoCommit()){
+			try{
+				if (statement != null){
+					statement.close();
+				}
+				if (connection != null){
+					connection.close();
+				}
+			}catch(SQLException e){
+				log.error(e.getMessage(),e);
+			}
+		}
+	}
+	
+	private void close() {
 		Connection connection = CONNECTIONS.get(threadId);
 		try{
 			if (connection != null){
@@ -495,7 +507,7 @@ public class Adapter {
 		}
 	}
 	
-	protected void rollback() {
+	public void rollback() {
 		Connection connection = CONNECTIONS.get(threadId);
 		try{
 			if (connection != null){
@@ -509,7 +521,7 @@ public class Adapter {
 		}
 	}
 	
-	protected void commit() {
+	public void commit() {
 		Connection connection = CONNECTIONS.get(threadId);
 		try{
 			if (connection != null){
