@@ -67,7 +67,7 @@ public class DBConnectionTest
         	a1.put("age","33");
         	a1.onSave();
         	
-//        	int i = 1/0;
+        	int i = 1/0;
         	a.commit();
             assertTrue( true );
     	}catch(Exception e){
