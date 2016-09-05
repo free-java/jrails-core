@@ -25,9 +25,7 @@ import javax.mail.internet.MimeUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.rails.support.Support;
 import net.rails.support.mail.worker.SendWorker;
-import sun.util.logging.resources.logging;
 
 public class Mail {
 

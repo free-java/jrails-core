@@ -257,7 +257,7 @@ public abstract class Controller {
 			return param;
 		}else{
 			try {
-				return new String(param.getBytes(), AbsGlobal.getApplicationCharset());
+				return new String(param.getBytes(AbsGlobal.getServerCharset()), AbsGlobal.getApplicationCharset());
 			} catch (UnsupportedEncodingException e) {
 				log.error(e.getMessage(), e);
 			}

@@ -75,9 +75,11 @@
 		<copy file="${jr.war}" todir="${jr.tomcat.webapps}"/>
 	</target>
 	<target name="build">
+	    <ant target="package" />
+
+		<!-- 
 		<ant target="makewar" />
 		<ant target="deploy.remote" />
-		<!-- 
 		<ant target="deploy.local" />
 		<ant target="deploy.remote" />
 		<ant target="cdocs" />

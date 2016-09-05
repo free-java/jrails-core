@@ -19,6 +19,7 @@ import net.rails.support.Support;
 public abstract class AbsConfigWorker {
 	
 	public static String CONFIG_PATH;
+	public static String CONFIG_FILE_CHARSET = "UTF-8";
 	public abstract Map<String,Map<String,Object>> getConfs();
 	protected abstract String getResource();
 	protected Logger log;
@@ -66,7 +67,7 @@ public abstract class AbsConfigWorker {
 				if(files != null){					
 					for(File file : files){
 						try{
-							Map<String,Object> map = (Map<String,Object>)Yaml.load(FileUtils.readFileToString(file));
+							Map<String,Object> map = (Map<String,Object>)Yaml.load(FileUtils.readFileToString(file,CONFIG_FILE_CHARSET));
 							confs.put(file.getName().replaceFirst("(.[yY][mM][lL])$",""),map);
 						}catch(Exception e){
 							log.error("(File: "+ file.getName() +")" + e.getMessage(),e);
