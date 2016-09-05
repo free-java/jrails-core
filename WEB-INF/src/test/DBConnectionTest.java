@@ -54,7 +54,7 @@ public class DBConnectionTest
     	try{
         	g.setLocale("default");
         	a = new Account(g);
-        	a.useTransaction();;
+//        	a.useTransaction();;
         	a.setId(Support.code().id());
         	a.put("name","jack");
         	a.put("age","22");
@@ -67,7 +67,7 @@ public class DBConnectionTest
         	a1.put("age","33");
         	a1.onSave();
         	
-        	int i = 1/0;
+//        	int i = 1/0;
         	a.commit();
             assertTrue( true );
     	}catch(Exception e){

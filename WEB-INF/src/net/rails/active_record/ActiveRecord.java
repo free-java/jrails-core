@@ -58,11 +58,10 @@ public abstract class ActiveRecord extends IndexMap<String, Object> {
 	protected AbsGlobal g;
 	protected Logger log;
 	
-
-	/**
-	 * <p>Construction a default ActiveRecord.</p>
-	 * @param g is a AbsGlobal extend object.
-	 */
+    /**
+     * Construct an ActiveRecord object.
+     * @param g
+     */
 	public ActiveRecord(AbsGlobal g) {
 		super();
 		log = LoggerFactory.getLogger(getClass());
@@ -72,12 +71,11 @@ public abstract class ActiveRecord extends IndexMap<String, Object> {
 	}
 
 	/**
-	 * <p>Construct a value of active record.</p>
-	 * <p><b>Run script:</b> SELECT * FROM table_name WHERE id = 'params id'.</p>
-	 * @param g is a AbsGlobal extend object.
-	 * @param id is data record id value.
-	 * @throws SQLException.
-	 * @throws RecordNotFoundException Record not found.
+	 * Construct an ActiveRecord object from table a record.
+	 * @param g
+	 * @param id The record id.
+	 * @throws SQLException
+	 * @throws RecordNotFoundException Table no exist record.
 	 */
 	public ActiveRecord(AbsGlobal g, Object id) throws SQLException,
 			RecordNotFoundException {
@@ -91,11 +89,11 @@ public abstract class ActiveRecord extends IndexMap<String, Object> {
 
 	//Begin protected methods
 	/**
-	 * Validate attributes input value.
+	 * Validate the object attributes values.
 	 * @param on See the class defines ActiveRecord.ON_SAVE、ActiveRecord.ON_CREATE、ActiveRecord.ON_UPDATE.
-	 * @param values Input values.
-	 * @throws ConfigurException Load failure in config/models/*.yml .
-	 * @throws MessagesException Validate failed.
+	 * @param values Mapping keys and names.
+	 * @throws ConfigurException Load failure in config/models/*.yml.
+	 * @throws MessagesException Validate results.
 	 */
 	protected void messages(String on, Map<String, Object> values)
 			throws ConfigurException, MessagesException {		
@@ -219,7 +217,7 @@ public abstract class ActiveRecord extends IndexMap<String, Object> {
 		}
 	}
 
-	protected boolean delete(boolean shared) throws SQLException,
+	protected boolean deleteSlef() throws SQLException,
 			FieldNotFoundException {
 		Map<String, Object> values = new HashMap<String, Object>();
 		List<String> attrs = getAttributes();
@@ -245,14 +243,14 @@ public abstract class ActiveRecord extends IndexMap<String, Object> {
 				.params())) > 0;
 	}
 
-	protected boolean clearValue(boolean shared, String attr)
+	protected boolean clearValue(String attr)
 			throws SQLException, ValidateException, ConfigurException,
 			TypeException {
 		put(attr, null);
 		return update();
 	}
 
-	protected boolean destroy(boolean shared) throws SQLException {
+	protected boolean destroySlef() throws SQLException {
 		DestroyWorker worker = Sql.destroy(this);
 		worker.wheres().add(String.format("%s.%s = :_id",
 				writerAdapter.quoteSchemaAndTableName(), writerAdapter.quotePrimaryKey()));
@@ -284,6 +282,9 @@ public abstract class ActiveRecord extends IndexMap<String, Object> {
 				q.and(and).or(or);
 				List<ActiveRecord> list = q.find();				
 				for (ActiveRecord a : list) {
+					if(isUseTransaction()){
+						a.useTransaction();
+					}
 					if (method.equals("delete")) {
 						a.delete();
 					} else if (method.equals("destroy")) {
@@ -299,11 +300,29 @@ public abstract class ActiveRecord extends IndexMap<String, Object> {
 			}
 		}
 	}
+	
+	protected boolean deleteClearValue(String attr) throws Exception {
+		if (getDelete() == null) {
+			return clearValue(attr);
+		} else {
+			recursion("delete");
+			return clearValue(attr);
+		}
+	}
+	
+	protected boolean destroyClearValue(String attr) throws Exception {
+		if (getDestroy() == null) {
+			return clearValue(attr);
+		} else {
+			recursion("destroy");
+			return clearValue(attr);
+		}
+	}
 	//End protected methods
 	
 	//Begin public methods
 	/**
-	 * Clone all values of the same active record.
+	 * Clone all values of the same active record(NonuseTransaction).
 	 * @return New ActiveRecord object.
 	 */
 	@Override
@@ -311,10 +330,10 @@ public abstract class ActiveRecord extends IndexMap<String, Object> {
 		try {
 			ActiveRecord c = getClass().getConstructor(AbsGlobal.class).newInstance(getGlobal());
 			c.putAll(this);
-			c.putAllFindRecord(this.beforeRecord);
+			c.putAllFindRecord(beforeRecord);
 			c.updateValues.clear();
-			c.updateValues.putAll(this.updateValues);
-			c.setSaveAction(this.saveAction);
+			c.updateValues.putAll(updateValues);
+			c.setSaveAction(saveAction);
 			return c;
 		} catch (Exception e) {
 			log.error(e.getMessage(),e);
@@ -627,10 +646,10 @@ public abstract class ActiveRecord extends IndexMap<String, Object> {
 		boolean b = false;
 		if(beforeDestroy()){
 			if (getDestroy() == null) {
-				b = destroy(true);
+				b = destroySlef();
 			} else {
 				recursion("destroy");
-				b = destroy(true);
+				b = destroySlef();
 			}
 		}
 		if(b)
@@ -652,47 +671,16 @@ public abstract class ActiveRecord extends IndexMap<String, Object> {
 		
 		if(beforeDelete()){
 			if (getDelete() == null) {
-				b = delete(true);
+				b = deleteSlef();
 			} else {
 				recursion("delete");
-				b = delete(true);
+				b = deleteSlef();
 			}
 			if(b)
 				afterDelete();
 		}
 		
 		return b;
-	}
-
-
-	/**
-	 * 框架内部处理方法，一般不调用。
-	 * @param attr
-	 * @return
-	 * @throws Exception
-	 */
-	public boolean deleteClearValue(String attr) throws Exception {
-		if (getDelete() == null) {
-			return clearValue(true, attr);
-		} else {
-			recursion("delete");
-			return clearValue(true, attr);
-		}
-	}
-	
-	/**
-	 * 框架内部处理方法，一般不调用。
-	 * @param attr
-	 * @return
-	 * @throws Exception
-	 */
-	public boolean destroyClearValue(String attr) throws Exception {
-		if (getDestroy() == null) {
-			return clearValue(true, attr);
-		} else {
-			recursion("destroy");
-			return clearValue(true, attr);
-		}
 	}
 
 	/**
@@ -1081,7 +1069,7 @@ public abstract class ActiveRecord extends IndexMap<String, Object> {
 		writerAdapter.setAutoCommit(false);
 	}
 	
-	public void unUseTransaction(){
+	public void nonuseTransaction(){
 		writerAdapter.setAutoCommit(true);
 	}
 	
@@ -1202,5 +1190,9 @@ public abstract class ActiveRecord extends IndexMap<String, Object> {
 	}
 	
     //End static methods
+	
+	//Begin private methods
+
+	//End private methods
 	
 }
