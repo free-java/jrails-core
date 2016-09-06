@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.rails.Define;
 import net.rails.active_record.ActiveRecord;
 import net.rails.ext.AbsGlobal;
 import net.rails.ext.Json;
@@ -90,7 +91,7 @@ public class Tpl implements ReferenceInsertionEventHandler,NullSetEventHandler, 
 		Velocity.setProperty(Velocity.RUNTIME_LOG_LOGSYSTEM,logChute);
 		Velocity.setProperty(Velocity.RUNTIME_LOG,logChute);
 		Velocity.setProperty("resource.loader", "file");
-		Velocity.setProperty("file.resource.loader.path",AbsConfigWorker.CONFIG_PATH + "/../view/");
+		Velocity.setProperty("file.resource.loader.path",Define.VIEW_PATH);
 		Velocity.setProperty("file.resource.loader.class","org.apache.velocity.runtime.resource.loader.FileResourceLoader");
 		Velocity.setProperty("input.encoding",CHARSET);
 		Velocity.setProperty("output.encoding", CHARSET);

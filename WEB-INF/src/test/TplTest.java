@@ -50,7 +50,7 @@ public class TplTest
     	try{
         	g.setLocale("default");
         	TplText text = new TplText("chinese", g,"chinese.tpl.html");
-        	Tpl tpl = new Tpl(g, text);
+        	Tpl tpl = new Tpl(g,text);
         	System.out.println(tpl.generate());
             assertTrue( true );
     	}catch(Exception e){

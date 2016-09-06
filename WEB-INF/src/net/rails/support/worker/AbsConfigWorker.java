@@ -13,16 +13,19 @@ import org.ho.yaml.Yaml;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.rails.Define;
 import net.rails.support.Support;
 
 @SuppressWarnings("unchecked")
 public abstract class AbsConfigWorker {
 	
-	public static String CONFIG_PATH;
-	public static String CONFIG_FILE_CHARSET = "UTF-8";
 	public abstract Map<String,Map<String,Object>> getConfs();
 	protected abstract String getResource();
 	protected Logger log;
+	
+	static{
+		initConfigPath();
+	}
 	
 	public AbsConfigWorker(){
 		super();
@@ -37,17 +40,17 @@ public abstract class AbsConfigWorker {
 		URL url = null;
 		String path = null;
 		try {
-			if(CONFIG_PATH == null){
-			    url = Thread.currentThread().getContextClassLoader().getResource("config/" + getResource());
-			}else{
-				url = new URL("file:" + CONFIG_PATH + "/" + getResource());
-			}
-			if(url != null){
-				path = url.getFile();	
-			}else{
-				path = new File(System.getProperty("user.dir") + "/config/" + getResource()).getAbsolutePath();
-			}
-			
+//			if(Define.CONFIG_PATH == null){
+//			    url = Thread.currentThread().getContextClassLoader().getResource("config/" + getResource());
+//			}else{
+//				url = new URL("file:" + Define.CONFIG_PATH + "/" + getResource());
+//			}
+//			if(url != null){
+//				path = url.getFile();	
+//			}else{
+//				path = new File(System.getProperty("user.dir") + "/config/" + getResource()).getAbsolutePath();
+//			}
+			path = new File(Define.CONFIG_PATH + "/" + getResource()).getAbsolutePath();
 			return URLDecoder.decode(path,System.getProperty("file.encoding"));
 		} catch (Exception e) {
 			log.error(e.getMessage(),e);
@@ -67,7 +70,7 @@ public abstract class AbsConfigWorker {
 				if(files != null){					
 					for(File file : files){
 						try{
-							Map<String,Object> map = (Map<String,Object>)Yaml.load(FileUtils.readFileToString(file,CONFIG_FILE_CHARSET));
+							Map<String,Object> map = (Map<String,Object>)Yaml.load(FileUtils.readFileToString(file,Define.CONFIG_FILE_CHARSET));
 							confs.put(file.getName().replaceFirst("(.[yY][mM][lL])$",""),map);
 						}catch(Exception e){
 							log.error("(File: "+ file.getName() +")" + e.getMessage(),e);
@@ -115,6 +118,24 @@ public abstract class AbsConfigWorker {
 				return name.toLowerCase().endsWith(".yml");
 			}
 		};
+	}
+	
+	private static void initConfigPath() {	
+		URL url = null;
+		String path = null;
+		try {
+			if(Define.CONFIG_PATH == null){
+			    url = Thread.currentThread().getContextClassLoader().getResource("config/");
+				if(url != null){
+					path = url.getFile();	
+				}else{
+					path = new File(System.getProperty("user.dir") + "/config/").getAbsolutePath();
+				}
+				Define.CONFIG_PATH = URLDecoder.decode(path,System.getProperty("file.encoding"));
+			}
+		} catch (Exception e) {
+			LoggerFactory.getLogger(AbsConfigWorker.class).error(e.getMessage(),e);;
+		}
 	}
 
 }

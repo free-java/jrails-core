@@ -2,14 +2,18 @@ package net.rails.tpl;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.util.Map;
 
+import net.rails.Define;
 import net.rails.ext.AbsGlobal;
 import net.rails.ext.IndexMap;
 import net.rails.support.Support;
-import net.rails.support.worker.AbsConfigWorker;
 
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 读取模板文件内容类
@@ -18,10 +22,15 @@ import org.apache.commons.io.FileUtils;
  */
 public class TplText {
 
+	private final static Logger log = LoggerFactory.getLogger(TplText.class);
 	private AbsGlobal g;
 	private String name;
 	private StringBuffer text;
 	private final Map<String,Object> params = new IndexMap<String,Object>();
+	
+	static{
+		initViewPath();
+	}
 	
 	/**
 	 * 构造方法。
@@ -47,7 +56,7 @@ public class TplText {
 		super();
 		this.g = g;
 		this.name = name;
-		String s = FileUtils.readFileToString(new File(AbsConfigWorker.CONFIG_PATH + "/../view/" + tplFile),Support.env().getApplicationCharset());
+		String s = FileUtils.readFileToString(new File(Define.VIEW_PATH + "/" + tplFile),Support.env().getApplicationCharset());
 		this.text = new StringBuffer(s);
 	}
 	
@@ -123,6 +132,24 @@ public class TplText {
 	 */
 	public Map<String,Object> params(){
 		return params;
+	}
+	
+	private static void initViewPath() {	
+		URL url = null;
+		String path = null;
+		try {
+			if(Define.VIEW_PATH == null){
+			    url = Thread.currentThread().getContextClassLoader().getResource("view/");
+			    if(url != null){
+					path = url.getFile();	
+				}else{
+					path = new File(System.getProperty("user.dir") + "/view/").getAbsolutePath();
+				}
+				Define.VIEW_PATH = URLDecoder.decode(path,System.getProperty("file.encoding"));
+			}
+		} catch (Exception e) {
+			log.error(e.getMessage(),e);
+		}
 	}
 
 }

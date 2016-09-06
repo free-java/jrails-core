@@ -1,12 +1,13 @@
 package test;
 
+import net.rails.Define;
 import net.rails.ext.AbsGlobal;
-import net.rails.support.worker.AbsConfigWorker;
 
 public class GlobalUnit extends AbsGlobal {
 	
 	static{
-		AbsConfigWorker.CONFIG_PATH = String.format("%s/WEB-INF/config",System.getProperty("user.dir"));
+		Define.CONFIG_PATH = String.format("%s/WEB-INF/config",System.getProperty("user.dir"));
+		Define.VIEW_PATH = String.format("%s/WEB-INF/view",System.getProperty("user.dir"));
 	}
 	
 	private Object userId;
