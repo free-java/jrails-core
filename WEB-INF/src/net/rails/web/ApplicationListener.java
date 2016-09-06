@@ -53,10 +53,10 @@ public class ApplicationListener implements ServletContextListener {
 			Define.CONFIG_PATH = String.format("%s/config/",webinf);
 			log.debug("Set Define.CONFIG_PATH = {}",Define.CONFIG_PATH);
 		}
-		if (Define.CONFIG_PATH == null) {
+		if (Define.VIEW_PATH == null) {
 			String webinf = new File(String.format("%s/WEB-INF/",context.getServletContext().getRealPath("/"))).getAbsolutePath();
 			Define.VIEW_PATH = String.format("%s/view/",webinf);
-			log.debug("Set Define.VIEW_PATH = {}",Define.CONFIG_PATH);
+			log.debug("Set Define.VIEW_PATH = {}",Define.VIEW_PATH);
 		}
 		File logPropFile = new File(String.format("%s/log4j.properties",Define.CONFIG_PATH));
 		if (logPropFile.exists()) {
