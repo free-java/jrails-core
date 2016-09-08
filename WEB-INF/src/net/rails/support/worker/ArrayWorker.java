@@ -34,9 +34,9 @@ public final class ArrayWorker<T> {
 		source.addAll(hs);
 	}
 	
-	public List<T> def(String def){
+	public List<T> def(String defaultValue){
 		if(Support.object(source).blank())
-			return (List<T>) Json.parse(def);
+			return (List<T>) Json.parse(defaultValue);
 		else
 			return source;
 	}

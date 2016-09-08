@@ -6,12 +6,6 @@ import java.util.Map;
 
 import net.rails.support.Support;
 
-/**
- * 配置工人；
- * 读取config/*.yml文件内容并转换成Map格式，文件名（不包含后缀）将会是key。
- * @author Jack
- *
- */
 public final class ConfigWorker {
 
 	public static Map<String, Map<String, Object>> CONFS = null;
@@ -20,17 +14,10 @@ public final class ConfigWorker {
 	public static Map<String, List<Map<String, Object>>> DELETE_CONFS = null;
 	public static Map<String, List<Map<String, Object>>> DESTROY_CONFS = null;
 
-	/**
-	 * 构造方法
-	 */
 	public ConfigWorker(){
 		super();
 	}
 	
-	/**
-	 * 获取config/根目录的配置文件内容并转换成Map格式。
-	 * @return AbsConfigWorker
-	 */
 	public AbsConfigWorker getConfig() {
 		AbsConfigWorker c = new AbsConfigWorker() {
 			@Override
@@ -50,18 +37,10 @@ public final class ConfigWorker {
 		return c;
 	}
 
-	/**
-	 * 获取config/env.yml配置文件内容。
-	 * @return EnvWorker
-	 */
 	public EnvWorker env() {
 		return new EnvWorker();
 	}
 
-	/**
-	 * 获取config/models/*.yml配置文件内容。
-	 * @return AbsConfigWorker
-	 */
 	public AbsConfigWorker getModels() {
 		AbsConfigWorker c = new AbsConfigWorker() {
 			@Override
@@ -80,10 +59,6 @@ public final class ConfigWorker {
 		return c;
 	}
 	
-	/**
-	 * 获取config/models/*.yml里面的依赖关系，一般用在框架内部。
-	 * @return
-	 */
 	@SuppressWarnings("unchecked")
 	public Map<String, List<Map<String, Object>>> getDelete() {
 		if (DELETE_CONFS == null) {
@@ -100,10 +75,6 @@ public final class ConfigWorker {
 		return DELETE_CONFS;
 	}
 	
-	/**
-	 * 获取config/models/*.yml里面的依赖关系，一般用在框架内部。
-	 * @return
-	 */
 	public Map<String, List<Map<String, Object>>> getDestroy() {
 		if (DESTROY_CONFS == null) {
 			DESTROY_CONFS = new HashMap<String, List<Map<String, Object>>>();
@@ -119,10 +90,6 @@ public final class ConfigWorker {
 		return DESTROY_CONFS;
 	}
 
-	/**
-	 * 获取config/locales/*.yml获取国际化语言配置文件内容并以Map输出。
-	 * @return AbsConfigWorker
-	 */
 	public AbsConfigWorker getLocales() {
 		AbsConfigWorker c = new AbsConfigWorker() {
 			@Override
