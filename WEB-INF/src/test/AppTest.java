@@ -15,6 +15,8 @@ import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.time.DateUtils;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import net.rails.active_record.Database;
 import net.rails.ciphertext.Ciphertext;
@@ -167,6 +169,16 @@ public class AppTest
 		Date actDate = DateUtils.truncate(f.parse("2016-08-20"), Calendar.DATE);
 		System.out.println(dateOfBound.after(actDate));
 		System.out.println(dateOfBound.getTime() > actDate.getTime());
+		
+		try{
+			g.options.put("test", "1111");
+			g.setUserId("test_user_id");
+			MDC.put("userId",g.getUserId()+"");
+//			MDC.putCloseable("userId", "TEST KEY");
+			LoggerFactory.getLogger(this.getClass()).debug("-----------");
+		}finally{
+			MDC.clear();
+		}
 	}
     
 }

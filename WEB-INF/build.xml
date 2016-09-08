@@ -11,7 +11,7 @@
 	<property name="jr.classes" value="${jr.root}/WEB-INF/classes" />
 	<property name="jr.core.jar" value="${jr.build}/${ant.project.name}-${jr.version}.jar" />
 	<property name="jr.war" value="/tmp/${ant.project.name}.war" />
-	<property name="jr.tomcat.webapps" value="/usr/local/src/lib/tomcat/default/webapps/" />
+	<property name="jr.tomcat.webapps" value="/src/lib/tomcat/default/webapps/" />
 	<path id="classpath">
 		<fileset dir="${jr.lib}">
 			<include name="**/*.jar" />
