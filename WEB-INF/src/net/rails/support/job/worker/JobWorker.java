@@ -1,73 +1,126 @@
 package net.rails.support.job.worker;
 
-public class JobWorker {
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import org.quartz.JobExecutionContext;
+import org.quartz.JobListener;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.Trigger;
+import org.quartz.TriggerListener;
+import org.quartz.Trigger.CompletedExecutionInstruction;
+import org.quartz.impl.StdSchedulerFactory;
+import org.slf4j.LoggerFactory;
+
+import net.rails.ext.AbsGlobal;
+import net.rails.support.Support;
+import net.rails.web.ApplicationListener;
+
+public abstract class JobWorker {
+
+	public static Scheduler GLOBAL_SCHEDULER;
+
+	static {
+		StdSchedulerFactory factory = new StdSchedulerFactory();
+		try {
+			GLOBAL_SCHEDULER = factory.getScheduler();
+		} catch (SchedulerException e) {
+			LoggerFactory.getLogger(ApplicationListener.class).error(e.getMessage(), e);
+		}
+	}
 	
-	private String classify;
-	private String jobGroup;
-	private String jobName;
-	private String triggerGroup;
-	private String triggerName;
-	private String cronExpression;
-	private String hostnames;
-	
-	public JobWorker() {
-		super();
-	}
+	public static DefaultScheduleWorker defaultSchedule(AbsGlobal g){
+		return new DefaultScheduleWorker(g) {
+			final List<JobObject> SCHEDULE_JOBS = new ArrayList<JobObject>();
+			@Override
+			public List<JobObject> getScheduleJobs() {
+				JobObject jobWorker = new JobObject();
+				Object o = Support.env().get("jobs");
+				if (o instanceof List) {
+					List<Map<String, Object>> jobs = (List<Map<String, Object>>) o;
+					for (Map<String, Object> job : jobs) {
+						String jobName = (String) Support.map(job).keys().get(0);
+						Map<String, String> jobItem = (Map<String, String>) job.get(jobName);
+						String jobClass = jobItem.get("classify");
+						String hostnames = jobItem.get("hostnames") == null ? "%" : jobItem.get("hostnames");
+						String cronExpression = (String) jobItem.get("cron_expression");
+						String jobGroup = "DEFAULT_JOB_GROUP";
+						String triggerGroup = "DEFAULT_TRIGGER_GROUP";
+						String triggerName = "Trigger_" + jobName;
+						jobWorker = new JobObject();
+						jobWorker.setClassify(jobClass);
+						jobWorker.setCronExpression(cronExpression);
+						jobWorker.setJobGroup(jobGroup);
+						jobWorker.setJobName(jobName);
+						jobWorker.setTriggerGroup(triggerGroup);
+						jobWorker.setTriggerName(triggerName);
+						jobWorker.setHostnames(hostnames);
+						SCHEDULE_JOBS.add(jobWorker);
+					}
+				}
+				return SCHEDULE_JOBS;
+			}
+			
+			@Override
+			public TriggerListener getTriggerListener() {
+				return new TriggerListener() {
 
-	public String getJobGroup() {
-		return jobGroup;
-	}
+					@Override
+					public boolean vetoJobExecution(Trigger trigger, JobExecutionContext context) {
+						boolean veto = false;
+						String local = null;
+						String currentTriggerName = null;
+						String currentTriggerGroup = null;
+						for (Iterator<JobObject> iterator = SCHEDULE_JOBS.iterator(); iterator.hasNext();) {
+							JobObject jobWorker = iterator.next();
+							List<String> hosts = Arrays.asList(jobWorker.getHostnames().split(","));
+							local = getHostname();
+							currentTriggerGroup = trigger.getKey().getGroup();
+							currentTriggerName = trigger.getKey().getName();
+							if (currentTriggerGroup.equals(jobWorker.getTriggerGroup()) && currentTriggerName.equals(jobWorker.getTriggerName())) {
+								if (hosts.contains("%") || hosts.contains(local)) {
+									veto = false;
+								} else {
+									veto = true;
+								}
+								log.debug(String.format("Job %s(%s.%s) veto status: %s", local,currentTriggerGroup,currentTriggerName, veto));
+							}
+						}
+						return veto;
+					}
 
-	public void setJobGroup(String jobGroup) {
-		this.jobGroup = jobGroup;
-	}
+					@Override
+					public void triggerMisfired(Trigger trigger) {
 
-	public String getJobName() {
-		return jobName;
-	}
+					}
 
-	public void setJobName(String jobName) {
-		this.jobName = jobName;
-	}
+					@Override
+					public void triggerFired(Trigger trigger, JobExecutionContext context) {
 
-	public String getTriggerGroup() {
-		return triggerGroup;
-	}
+					}
 
-	public void setTriggerGroup(String triggerGroup) {
-		this.triggerGroup = triggerGroup;
-	}
+					@Override
+					public void triggerComplete(Trigger trigger, JobExecutionContext context,
+							CompletedExecutionInstruction triggerInstructionCode) {
+						
+					}
 
-	public String getTriggerName() {
-		return triggerName;
-	}
+					@Override
+					public String getName() {
+						return "DefaultScheduleWorker-TriggerListener";
+					}
+				};
+			}
 
-	public void setTriggerName(String triggerName) {
-		this.triggerName = triggerName;
-	}
-
-	public String getCronExpression() {
-		return cronExpression;
-	}
-
-	public void setCronExpression(String cronExpression) {
-		this.cronExpression = cronExpression;
-	}
-
-	public String getClassify() {
-		return classify;
-	}
-
-	public void setClassify(String classify) {
-		this.classify = classify;
-	}
-
-	public String getHostnames() {
-		return hostnames;
-	}
-
-	public void setHostnames(String hostnames) {
-		this.hostnames = hostnames;
+			@Override
+			public JobListener getJobListener() {
+				return null;
+			}
+		};
 	}
 
 }

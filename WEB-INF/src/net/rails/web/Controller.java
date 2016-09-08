@@ -46,11 +46,6 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * 控制器的基类,所有控制器必须继承这类，并必须在app.controller包下面。
- * @author Jack
- *
- */
 @SuppressWarnings("unchecked")
 public abstract class Controller {
 
@@ -84,7 +79,7 @@ public abstract class Controller {
 		this.response = response;
 		this.session = request.getSession();
 		this.route = route;
-		userAgent = new UserAgentWorker(request.getHeader("user-agent"));
+		userAgent = Support.userAgent(request.getHeader("user-agent"));
 		ajax = request.getHeader("X-Requested-With") != null;
 		final Enumeration<String> ens = request.getHeaderNames();
 		Map<String, Object> qs = QueryString.parse(request.getQueryString());

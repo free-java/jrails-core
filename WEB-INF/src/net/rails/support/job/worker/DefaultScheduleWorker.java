@@ -14,7 +14,7 @@ public abstract class DefaultScheduleWorker {
 	protected Logger log;
 	protected AbsGlobal g;
 
-	public abstract List<JobWorker> getScheduleJobs();
+	public abstract List<JobObject> getScheduleJobs();
 	public abstract TriggerListener getTriggerListener();
 	public abstract JobListener getJobListener();
 	

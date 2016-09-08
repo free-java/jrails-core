@@ -21,8 +21,8 @@ import org.slf4j.LoggerFactory;
 import net.rails.Define;
 import net.rails.ext.AbsGlobal;
 import net.rails.support.Support;
-import net.rails.support.job.Job;
 import net.rails.support.job.worker.DefaultScheduleWorker;
+import net.rails.support.job.worker.JobObject;
 import net.rails.support.job.worker.JobWorker;
 import net.rails.support.worker.AbsConfigWorker;
 
@@ -107,13 +107,13 @@ public class ApplicationListener implements ServletContextListener {
 		try {
 			log.debug("Starting Jobs");
 			if (o instanceof List) {
-				scheduleWorker = Job.defaultSchedule(g);
+				scheduleWorker = JobWorker.defaultSchedule(g);
 			} else {
 				scheduleWorker = (DefaultScheduleWorker) Class.forName(o.toString()).getConstructor(AbsGlobal.class)
 						.newInstance(g);
 			}
-			List<JobWorker> jobs = scheduleWorker.getScheduleJobs();
-			for (JobWorker jobWorker : jobs) {
+			List<JobObject> jobs = scheduleWorker.getScheduleJobs();
+			for (JobObject jobWorker : jobs) {
 				String jobName = jobWorker.getJobName();
 				String jobClass = jobWorker.getClassify();
 				String cronExpression = jobWorker.getCronExpression();
@@ -131,13 +131,13 @@ public class ApplicationListener implements ServletContextListener {
 				JobListener jobListener = scheduleWorker.getJobListener();
 				TriggerListener triggerListener = scheduleWorker.getTriggerListener();
 				if(jobListener != null){
-					Job.GLOBAL_SCHEDULER.getListenerManager().addJobListener(scheduleWorker.getJobListener());
+					JobWorker.GLOBAL_SCHEDULER.getListenerManager().addJobListener(scheduleWorker.getJobListener());
 				}
 				if(triggerListener != null){
-					Job.GLOBAL_SCHEDULER.getListenerManager().addTriggerListener(scheduleWorker.getTriggerListener());
+					JobWorker.GLOBAL_SCHEDULER.getListenerManager().addTriggerListener(scheduleWorker.getTriggerListener());
 				}
-				Job.GLOBAL_SCHEDULER.start();
-				Job.GLOBAL_SCHEDULER.scheduleJob(jobDetail, trigger);
+				JobWorker.GLOBAL_SCHEDULER.start();
+				JobWorker.GLOBAL_SCHEDULER.scheduleJob(jobDetail, trigger);
 			}
 			log.debug("Started Jobs");
 		} catch (Exception e) {
@@ -150,10 +150,10 @@ public class ApplicationListener implements ServletContextListener {
 			return;
 		}
 		try {
-			if(Job.GLOBAL_SCHEDULER != null){
-				Job.GLOBAL_SCHEDULER.shutdown(true);
+			if(JobWorker.GLOBAL_SCHEDULER != null){
+				JobWorker.GLOBAL_SCHEDULER.shutdown(true);
 			}
-			log.debug("Scheduler Shutdown Status: {}",Job.GLOBAL_SCHEDULER.isShutdown());
+			log.debug("Scheduler Shutdown Status: {}",JobWorker.GLOBAL_SCHEDULER.isShutdown());
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}

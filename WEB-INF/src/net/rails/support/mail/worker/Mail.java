@@ -1,4 +1,4 @@
-package net.rails.support.mail;
+package net.rails.support.mail.worker;
 
 import java.io.File;
 import java.security.KeyStore.PrivateKeyEntry;
@@ -24,8 +24,6 @@ import javax.mail.internet.MimeUtility;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import net.rails.support.mail.worker.SendWorker;
 
 public class Mail {
 

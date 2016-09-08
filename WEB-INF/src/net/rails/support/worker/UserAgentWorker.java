@@ -7,12 +7,7 @@ import java.util.regex.Pattern;
 
 import net.rails.support.Support;
 
-/**
- * UserAgent分析类
- * @author Jack
- *
- */
-public final class UserAgentWorker {
+public abstract class UserAgentWorker {
 	
 	public final static List<String> Mobiles = Arrays.asList(Families.Android,Families.Windows_Phone,Families.iPhone,Families.Symbian);
 	
