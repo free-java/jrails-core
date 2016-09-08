@@ -24,7 +24,6 @@ import net.rails.support.Support;
 import net.rails.support.job.worker.DefaultScheduleWorker;
 import net.rails.support.job.worker.JobObject;
 import net.rails.support.job.worker.JobWorker;
-import net.rails.support.worker.AbsConfigWorker;
 
 @WebListener
 public class ApplicationListener implements ServletContextListener {

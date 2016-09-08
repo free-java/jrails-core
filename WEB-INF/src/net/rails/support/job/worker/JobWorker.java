@@ -20,7 +20,7 @@ import net.rails.ext.AbsGlobal;
 import net.rails.support.Support;
 import net.rails.web.ApplicationListener;
 
-public abstract class JobWorker {
+public final class JobWorker {
 
 	public static Scheduler GLOBAL_SCHEDULER;
 

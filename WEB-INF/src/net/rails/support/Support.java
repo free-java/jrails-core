@@ -20,7 +20,6 @@ import net.rails.support.worker.ObjectWorker;
 import net.rails.support.worker.StringWorker;
 import net.rails.support.worker.UserAgentWorker;
 import net.rails.support.worker.ValidateMessageWorker;
-import net.rails.support.worker.WebClientWorker;
 
 public final class Support {
 
@@ -93,20 +92,12 @@ public final class Support {
 		return new EnvWorker();
 	}
 	
-	public static WebClientWorker webClient(String url){
-		return new WebClientWorker(url);
-	}
-	
-	public static WebClientWorker webClient(String url,String qs){
-		return new WebClientWorker(url,qs);
-	}
-	
 	public static UserAgentWorker userAgent(String ua){
 		return new UserAgentWorker(ua);
 	}
 	
 	public static JobWorker job(){
-		return new JobWorker(){};
+		return new JobWorker();
 	}
 
 }

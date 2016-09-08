@@ -1,4 +1,4 @@
-package net.rails.support.worker;
+package net.rails.web;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -19,7 +19,7 @@ import java.security.cert.X509Certificate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class WebClientWorker {
+public class WebClient {
 
 	protected boolean isHttps = false;
 	protected HttpURLConnection conn;
@@ -27,11 +27,11 @@ public class WebClientWorker {
 	protected String url;
 	protected String qs;
 
-	public WebClientWorker(String url) {
+	public WebClient(String url) {
 		this.url = url;
 	}
 	
-	public WebClientWorker(String url, String qs) {
+	public WebClient(String url, String qs) {
 		this.url = url;
 		this.qs = qs;
 	}
