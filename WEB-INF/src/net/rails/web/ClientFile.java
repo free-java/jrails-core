@@ -5,23 +5,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 
-/**
- * 处理客户端上传文件。
- * @author Jack
- *
- */
 @SuppressWarnings("serial")
 public class ClientFile implements Serializable{
 	
 	private String name;
 	private byte[] data;
 	
-	/**
-	 * 构造方法。
-	 * @param name 文件名称
-	 * @param is 输入流
-	 * @throws IOException
-	 */
 	public ClientFile(String name,InputStream is) throws IOException{
 		super();
 		this.name = name;
@@ -40,18 +29,10 @@ public class ClientFile implements Serializable{
 		}
 	}
 
-	/**
-	 * 获取文件名称
-	 * @return
-	 */
 	public String getName() {
 		return name;
 	}
 
-	/**
-	 * 获取文件数据包。
-	 * @return
-	 */
 	public byte[] getData() {
 		return data;
 	}

@@ -5,65 +5,40 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * 字符串工人。
- * @author Jack
- *
- */
-public class StringWorker {
+public final class StringWorker {
 	
-	public String target;
+	public String source;
 	
-	/**
-	 * 构造方法。
-	 * @param target 目标内容
-	 */
-	public StringWorker(String target){
+	public StringWorker(String source){
 		super();
-		this.target = target;
+		this.source = source;
 	}
 
-	/**
-	 * 检查目标内容是否为NULL。
-	 * @return
-	 */
 	public boolean nil(){
-		return target == null;
+		return source == null;
 	}
 	
-	/**
-	 * 检查目标内容是否为空白引号内容或者为NULL。
-	 * @return
-	 */
 	public boolean blank(){
-		return nil() || target.trim().equals("");
+		return nil() || source.trim().equals("");
 	}
 	
-	/**
-	 * 首字母大写。
-	 * @return
-	 */
 	public String firstUpCase(){
 		if(blank())
-			return target;
+			return source;
 		
-		String s = target.substring(0,1).toUpperCase();
-		if(target.length() > 1)
-			 s += target.substring(1);
+		String s = source.substring(0,1).toUpperCase();
+		if(source.length() > 1)
+			 s += source.substring(1);
 		return s;
 	}
 	
-	/**
-	 * 首字母小写。
-	 * @return
-	 */
 	public String firstLowerCase(){
 		if(blank())
-			return target;
+			return source;
 		
-		String s = target.substring(0,1).toLowerCase();
-		if(target.length() > 1)
-			 s += target.substring(1);
+		String s = source.substring(0,1).toLowerCase();
+		if(source.length() > 1)
+			 s += source.substring(1);
 		return s;
 	}
 	
@@ -73,64 +48,46 @@ public class StringWorker {
 	 */
 	public String lastUpCase(){
 		if(blank())
-			return target;
+			return source;
 		
 		String s = "";
-		if(target.length() > 1){
-			s = target.substring(0,target.length() - 1);
-			s += target.substring(target.length() - 1).toUpperCase();
+		if(source.length() > 1){
+			s = source.substring(0,source.length() - 1);
+			s += source.substring(source.length() - 1).toUpperCase();
 		}else{
-			s = target.toUpperCase();
+			s = source.toUpperCase();
 		}
 		return s;
 	}
 	
-	/**
-	 * 尾字母小写。
-	 * @return
-	 */
 	public String lastLowerCase(){
 		if(blank())
-			return target;
+			return source;
 		
 		String s = "";
-		if(target.length() > 1){
-			s = target.substring(0,target.length() - 1);
-			s += target.substring(target.length() - 1).toLowerCase();
+		if(source.length() > 1){
+			s = source.substring(0,source.length() - 1);
+			s += source.substring(source.length() - 1).toLowerCase();
 		}else{
-			s = target.toUpperCase();
+			s = source.toUpperCase();
 		}
 		return s;
 	}
 	
-	/**
-	 * 去掉最后一字符。
-	 * @return
-	 */
 	public String chop(){
 		if(blank())
-			return target;
+			return source;
 		
-		return target.substring(0,target.length() - 1);		
+		return source.substring(0,source.length() - 1);		
 	}
 	
-	/**
-	 * 当目标为空白绰号时返回默认值。
-	 * @param def 默认值
-	 * @return
-	 */
-	public String def(String def){
+	public String def(String defaultValue){
 		if(blank())
-			return def;
+			return defaultValue;
 		else
-			return target;
+			return source;
 	}
 	
-	/**
-	 * 检查内容是否符合指定的日期格式
-	 * @param dateFormat 例: yyyy-MM-dd HH:mm:ss
-	 * @return
-	 */
 	public boolean isDateFormat(String dateFormat){
 		String f = dateFormat + "";
 		Map<String, String> fs = new HashMap<String,String>();
@@ -170,7 +127,7 @@ public class StringWorker {
 		f = f.replaceAll("a",fs.get("a"));
 		
 		Pattern p = Pattern.compile("^" + f + "$");
-		Matcher m = p.matcher(target);
+		Matcher m = p.matcher(source);
 		return m.matches();
 	}
 

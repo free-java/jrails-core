@@ -12,7 +12,7 @@ import net.rails.support.Support;
  * @author Jack
  *
  */
-public class ConfigWorker {
+public final class ConfigWorker {
 
 	public static Map<String, Map<String, Object>> CONFS = null;
 	public static Map<String, Map<String, Object>> MODEL_CONFS = null;

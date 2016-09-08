@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 import net.rails.support.Support;
 
-public abstract class UserAgentWorker {
+public final class UserAgentWorker {
 	
 	public final static List<String> Mobiles = Arrays.asList(Families.Android,Families.Windows_Phone,Families.iPhone,Families.Symbian);
 	
@@ -42,10 +42,6 @@ public abstract class UserAgentWorker {
 	private TokenWorker engine;
 	private TokenWorker browser;
 	
-	/**
-	 * 构造方法。
-	 * @param ua UserAgent字符串
-	 */
 	public UserAgentWorker(String ua){
 		super();
 		this.ua = ua;
@@ -98,34 +94,18 @@ public abstract class UserAgentWorker {
 		}
 	}
 	
-	/**
-	 * 获取是否移动设备
-	 * @return
-	 */
 	public boolean isMobile(){
 		return Mobiles.contains(os.getFamily());
 	}
 	
-	/**
-	 * 获取设备的操作系统对象。
-	 * @return
-	 */
 	public TokenWorker os(){
 		return os;
 	}
 	
-	/**
-	 * 获取设备浏览器的引擎对象。
-	 * @return
-	 */
 	public TokenWorker engine(){
 		return engine;
 	}
 	
-	/**
-	 * 获取设备浏览器对象。
-	 * @return
-	 */
 	public TokenWorker browser(){
 		return browser;
 	}

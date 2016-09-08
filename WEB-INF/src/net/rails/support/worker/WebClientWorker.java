@@ -19,15 +19,6 @@ import java.security.cert.X509Certificate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Call HTTP/HTTPS worker.
- * Sample:
- * WebClientWorker client = new WebClientWorker("https://www.google.com");
- * int code = client.doGet();
- * System.out.println(client.getResponseText());
- * @author Jack
- *
- */
 public class WebClientWorker {
 
 	protected boolean isHttps = false;
@@ -36,44 +27,25 @@ public class WebClientWorker {
 	protected String url;
 	protected String qs;
 
-	/**
-	 * @param url 请求网址
-	 */
 	public WebClientWorker(String url) {
 		this.url = url;
 	}
 	
-	/**
-	 * @param url is request remote link,sample: http://www.domain.com/path.
-	 * @param qs is query string,sample: name=Jack&addr=hongkong
-	 */
 	public WebClientWorker(String url, String qs) {
 		this.url = url;
 		this.qs = qs;
 	}
 	
-	/**
-	 * Use GET method rquest server.
-	 * @throws Exception
-	 */
 	public int get() throws Exception{
 		setMethod("GET");
 		return connect();
 	}
 	
-	/**
-	 * Use POST method request server.
-	 * @throws Exception
-	 */
 	public int post() throws Exception{
 		setMethod("POST");
 		return connect();
 	}
 
-	/**
-	 * 连接请求，须指定请求方法GET或者POSt。
-	 * @throws Exception
-	 */
 	public int connect() throws Exception {
 		URL connUrl = new URL(url);
 		isHttps = connUrl.toString().indexOf("https://") == 0 ? true : false;
@@ -139,42 +111,22 @@ public class WebClientWorker {
 		return conn.getResponseCode();
 	}
 	
-	/**
-	 * 获取连接对象。
-	 * @return HttpURLConnection
-	 */
 	public HttpURLConnection getConn(){
 		return conn;
 	}
 
-	/**
-	 * Setting request method GET/POST/PUT/DELETE.
-	 * @param method GET/POST/PUT/DELETE.
-	 */
 	public void setMethod(String method) {
 		this.method = method.toUpperCase();
 	}
 	
-	/**
-	 * Get request method.
-	 * @return GET/POST/PUT/DELETE.
-	 */
 	public String getMethod(){
 		return method;
 	}
 	
-	/**
-	 * Get request URL.
-	 * @return URL string.
-	 */
 	public String getUrl(){
 		return url;
 	}
 
-	/**
-	 * Get request content type charset value.
-	 * @return default is UTF-8.
-	 */
 	public String getCharset() {
 		String ct = conn.getContentType();
 		if (ct != null) {
@@ -186,28 +138,14 @@ public class WebClientWorker {
 			return null;
 	}
 
-	/**
-	 * Setting query string.
-	 * Sample: name=Jack&website=www.jrails.net
-	 * @param qs
-	 */
 	public void setQs(String qs) {
 		this.qs = qs;
 	}
 
-	/**
-	 * Get query string.
-	 * @return
-	 */
 	public String getQs() {
 		return qs;
 	}
 
-	/**
-	 * Get response bytes
-	 * @return byte[]
-	 * @throws IOException
-	 */
 	public byte[] getResponseBytes() throws IOException {		
 		InputStream input = null;
 		ByteArrayOutputStream out = null;
@@ -229,11 +167,6 @@ public class WebClientWorker {
 		}
 	}
 	
-	/**
-	 * Get error response bytes
-	 * @return byte[]
-	 * @throws IOException
-	 */
 	public byte[] getErrorBytes() throws IOException {		
 		InputStream input = null;
 		ByteArrayOutputStream out = null;
@@ -281,9 +214,6 @@ public class WebClientWorker {
 			return null;
 	}
 	
-	/**
-	 * 若要控制连接对象请重写这方法。
-	 */
 	protected void initConn(){
 		
 	}

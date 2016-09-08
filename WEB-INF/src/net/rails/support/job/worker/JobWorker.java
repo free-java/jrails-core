@@ -33,7 +33,7 @@ public abstract class JobWorker {
 		}
 	}
 	
-	public static DefaultScheduleWorker defaultSchedule(AbsGlobal g){
+	public DefaultScheduleWorker defaultSchedule(AbsGlobal g){
 		return new DefaultScheduleWorker(g) {
 			final List<JobObject> SCHEDULE_JOBS = new ArrayList<JobObject>();
 			@Override

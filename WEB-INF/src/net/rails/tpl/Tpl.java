@@ -45,11 +45,6 @@ import com.googlecode.htmlcompressor.compressor.HtmlCompressor;
 import com.yahoo.platform.yui.compressor.CssCompressor;
 import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
 
-/**
- * Template Class
- * @author Jack
- *
- */
 public class Tpl implements ReferenceInsertionEventHandler,NullSetEventHandler, MethodExceptionEventHandler {
 
 	public final static String DOCTYPE_JS = "js";
@@ -102,25 +97,12 @@ public class Tpl implements ReferenceInsertionEventHandler,NullSetEventHandler, 
 		Velocity.init();
 	}
 
-	/**
-	 * 构造方法。
-	 * @param g
-	 * @param text
-	 * @throws IOException
-	 */
 	public Tpl(AbsGlobal g,TplText text) throws IOException {
 		super();
 		this.g = g;
 		this.text = text;
 	}	
 
-	/**
-	 * 根据模板生成文本内容
-	 * @return StringWriter
-	 * @throws ParseErrorException
-	 * @throws MethodInvocationException
-	 * @throws ResourceNotFoundException
-	 */
 	public String generate() throws ParseErrorException,
 					MethodInvocationException, ResourceNotFoundException {
 		text.params().put("null",null);

@@ -36,7 +36,7 @@ public class MapWorker<K,V> {
 			return null;
 
 		Map<K, V> m = (Map<K, V>) source;
-		String[] keyarr = keys.split(":");
+		String[] keyarr = keys.split("[:|\\.|/|\\\\]");
 		for (int i = 0; i < keyarr.length; i++) {
 			o = m.get(keyarr[i]);
 			if (o == null) {

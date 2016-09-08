@@ -14,11 +14,6 @@ import org.slf4j.LoggerFactory;
 import net.rails.ext.IndexMap;
 import net.rails.support.Support;
 
-/**
- * Query String
- * @author Jack
- *
- */
 @SuppressWarnings("serial")
 public class QueryString extends IndexMap<String,Object> {
 	
@@ -38,11 +33,6 @@ public class QueryString extends IndexMap<String,Object> {
 		super(m);
 	}
 	
-	/**
-	 * 解释查询字符串，重新生成Map<String,Object>对象。
-	 * @param queryString 查询字符串
-	 * @return
-	 */
 	public static Map<String,Object> parse(String queryString){
 		if(queryString == null)
 			return null;

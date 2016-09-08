@@ -102,7 +102,7 @@ public final class Support {
 	}
 	
 	public static UserAgentWorker userAgent(String ua){
-		return new UserAgentWorker(ua) {};
+		return new UserAgentWorker(ua);
 	}
 	
 	public static JobWorker job(){

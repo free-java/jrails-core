@@ -5,7 +5,7 @@ import java.util.List;
 import net.rails.ext.Json;
 import net.rails.support.Support;
 
-public class ArrayWorker<T> {
+public final class ArrayWorker<T> {
 	
 	private List<T> source;
 	

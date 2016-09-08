@@ -50,8 +50,6 @@ public class Route {
 	
 	public void putRouteParams(HttpServletRequest request,Map<String,Object> routeParams){
 		params = routeParams;
-//		if(params != null && request.getAttribute(ROUTE_PARAMS) == null)
-//			request.setAttribute(ROUTE_PARAMS,params);
 		if(params != null)
 			request.setAttribute(ROUTE_PARAMS,params);
 	}

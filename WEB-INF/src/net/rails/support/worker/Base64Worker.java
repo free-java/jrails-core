@@ -1,6 +1,6 @@
 package net.rails.support.worker;
 
-public class Base64Worker {
+public final class Base64Worker {
 
 	// The line separator string of the operating system.
 	private static final String systemLineSeparator = System.getProperty("line.separator");

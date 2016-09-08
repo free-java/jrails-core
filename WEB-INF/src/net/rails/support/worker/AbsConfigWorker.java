@@ -40,16 +40,6 @@ public abstract class AbsConfigWorker {
 		URL url = null;
 		String path = null;
 		try {
-//			if(Define.CONFIG_PATH == null){
-//			    url = Thread.currentThread().getContextClassLoader().getResource("config/" + getResource());
-//			}else{
-//				url = new URL("file:" + Define.CONFIG_PATH + "/" + getResource());
-//			}
-//			if(url != null){
-//				path = url.getFile();	
-//			}else{
-//				path = new File(System.getProperty("user.dir") + "/config/" + getResource()).getAbsolutePath();
-//			}
 			path = new File(Define.CONFIG_PATH + "/" + getResource()).getAbsolutePath();
 			return URLDecoder.decode(path,System.getProperty("file.encoding"));
 		} catch (Exception e) {

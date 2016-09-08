@@ -4,7 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-public class CalendarWorker {
+public final class CalendarWorker {
 
 	private Calendar source;
 	

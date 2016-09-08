@@ -8,11 +8,6 @@ import net.rails.cache.Cache;
 import net.rails.support.Support;
 import net.rails.web.Route;
 
-/**
- * 模板缓存管理类
- * @author Jack
- *
- */
 public abstract class TplCache {
 
 	private String tplContent;
@@ -21,13 +16,6 @@ public abstract class TplCache {
 	protected boolean force = false;
 	protected abstract String execution();
 	
-	/**
-	 * 构造方法。
-	 * @param force 是否强制刷新缓存
-	 * @param live 缓存生命周期, 0是不使用缓存,-1是永不过期，其它值是指定生命的秒数。 
-	 * @param route 路由器,缓存键生成是根据route的controller,action来记录的。
-	 * @param cacheKeys 缓存键生成规则。
-	 */
 	public TplCache(boolean force,int live,Route route,Object...cacheKeys) {
 		super();
 		this.force = force;
@@ -43,12 +31,6 @@ public abstract class TplCache {
 		init();
 	}
 	
-	/**
-	 * 构造方法。
-	 * @param live 
-	 * @param route
-	 * @param cacheKeys
-	 */
 	public TplCache(int live,Route route,Object...cacheKeys) {
 		super();
 		this.live = live;

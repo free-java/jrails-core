@@ -7,46 +7,22 @@ import org.apache.velocity.tools.generic.EscapeTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * 代码工人。
- * @author Jack
- *
- */
 public final class CodeWorker {
 	
 	private final Logger log = LoggerFactory.getLogger(CodeWorker.class);
 	
-	/**
-	 * HTML文本编译。
-	 * @param text
-	 * @return
-	 */
 	public String html(String text){
 		return new EscapeTool().html(text);
 	}
-	
-	/**
-	 * JavaScript编译
-	 * @param text
-	 * @return 
-	 */
+
 	public String js(String text){
 		return new EscapeTool().javascript(text);
 	}
 	
-	/**
-	 * Sql语句编译
-	 * @param text
-	 * @return
-	 */
 	public String sql(String text){
 		return new EscapeTool().sql(text);
 	}
 	
-	/**
-	 * 生成16位的唯一ID值。
-	 * @return
-	 */
 	public String id() {
 		final Character[] CHARS = new Character[] { '0', '1',
 				'2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd',
@@ -78,9 +54,6 @@ public final class CodeWorker {
 
 	}
 
-	/**
-	 * MD5加密。
-	 */
 	public String md5(String text) {
 		char hexDigits[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
 				'A', 'B', 'C', 'D', 'E', 'F' };

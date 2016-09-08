@@ -1,28 +1,32 @@
 package net.rails.support.worker;
 
 
-public class ObjectWorker<O> {
+public final class ObjectWorker<O> {
 
-	private O target;
+	private O source;
 	
-	public ObjectWorker(O target) {
+	public ObjectWorker(O source) {
 		super();
-		this.target = target;
+		this.source = source;
 	}
 	
 	public boolean nil(){
-		return target == null;
+		return source == null;
 	}
 	
 	public boolean blank(){
-		return nil() || target.toString().trim().equals("");
+		return nil() || source.toString().trim().equals("");
 	}
 	
-	public O def(O def){
+	public O def(O defaultValue){
 		if(blank())
-			return def;
+			return defaultValue;
 		else
-			return target;
+			return source;
+	}
+	
+	public O getSource(){
+		return source;
 	}
 
 }

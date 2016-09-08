@@ -107,7 +107,7 @@ public class ApplicationListener implements ServletContextListener {
 		try {
 			log.debug("Starting Jobs");
 			if (o instanceof List) {
-				scheduleWorker = JobWorker.defaultSchedule(g);
+				scheduleWorker = Support.job().defaultSchedule(g);
 			} else {
 				scheduleWorker = (DefaultScheduleWorker) Class.forName(o.toString()).getConstructor(AbsGlobal.class)
 						.newInstance(g);

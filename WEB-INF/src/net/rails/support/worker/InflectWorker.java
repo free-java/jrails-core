@@ -7,11 +7,6 @@ import java.util.regex.Pattern;
 
 import net.rails.support.Support;
 
-/**
- * 语型变化工人。
- * @author Jack
- *
- */
 public final class InflectWorker {
 	
 	private final List<String> UNCOUNTABLE = Arrays.asList(new String[]{
@@ -80,50 +75,38 @@ public final class InflectWorker {
 										};	
 
 
-	private String target;
+	private String source;
 	
-	/**
-	 * 构造
-	 * @param target
-	 */
 	public InflectWorker(String target){
 		super();
-		this.target = target;
+		this.source = target;
 	}
 
-	/**
-	 * 转换成复数形式。
-	 * @return
-	 */
 	public String pluralize(){
-		if(Support.string(target).blank())
+		if(Support.string(source).blank())
 			return "";
-		if(UNCOUNTABLE.contains(target))
-			return target;
+		if(UNCOUNTABLE.contains(source))
+			return source;
 		
 		int i = 0;
 		int ci = 0;
 		for(String[] plural : PLURAL){
 			p = Pattern.compile(plural[0]);
-			m = p.matcher(target);
+			m = p.matcher(source);
 			if(m.find()){
 				ci = i;
 			}
 			i++;
 		}
-		return target.replaceFirst(lasts(PLURAL[ci][0]),PLURAL[ci][1]);
+		return source.replaceFirst(lasts(PLURAL[ci][0]),PLURAL[ci][1]);
 	}
 	
-	/**
-	 * 转换成单数形式。
-	 * @return
-	 */
 	public String singularize(){	
-		if(Support.string(target).blank())
-			return target;
+		if(Support.string(source).blank())
+			return source;
 		
-		if(UNCOUNTABLE.contains(target))
-			return target;
+		if(UNCOUNTABLE.contains(source))
+			return source;
 		
 		int i = 0;
 		int ci = 0;
@@ -131,70 +114,54 @@ public final class InflectWorker {
 		Matcher m = null;
 		for(String[] plural : SINGULAR){
 			p = Pattern.compile(plural[0]);
-			m = p.matcher(target);
+			m = p.matcher(source);
 			if(m.find()){
 				ci = i;
 			}
 			i++;
 		}
-		return target.replaceFirst(lasts(SINGULAR[ci][0]),SINGULAR[ci][1]);
+		return source.replaceFirst(lasts(SINGULAR[ci][0]),SINGULAR[ci][1]);
 	}	
 	
-	/**
-	 * 转换成下划线形式。
-	 * @return
-	 */
 	public String underscore(){
-		if(Support.string(target).blank())
-			return target;		
+		if(Support.string(source).blank())
+			return source;		
 		
 		String s = "";
 		p = Pattern.compile("([A-Z]+(?=[A-Z]{1}[a-z]{1}))|([A-Z]+[a-z]*)|([a-z]+)|([0-9]+)|([_]+)");
-		m = p.matcher(target);
+		m = p.matcher(source);
 		while(m.find()){
 			s += "_" + m.group();
 		}
 		return s.trim().toLowerCase().replaceAll("([_]+(?=[_]{1}))|(^[_]{1})","");
 	}
 	
-	/**
-	 * 转换成骆驼命名形式。
-	 * @return
-	 */
 	public String camelcase(){
-		if(Support.string(target).blank())
-			return target;		
+		if(Support.string(source).blank())
+			return source;		
 		
 		String s = "";
 		p = Pattern.compile("([A-Z]+(?=[A-Z]{1}[a-z]{1}))|([A-Z]+[a-z]*)|([a-z]+)|([0-9]+)|([_]{2,})");
-		m = p.matcher(target);
+		m = p.matcher(source);
 		while(m.find()){
 			s +=  Support.string(m.group()).firstUpCase();
 		}
 		return s.trim().replaceAll("[_]+(?=[_]{1})","");
 	}
 	
-	/**
-	 * 转换成帕斯卡命名形式。
-	 * @return
-	 */
 	public String pascalcase(){
 		String s = camelcase();
 		return (s.charAt(0) + "").toLowerCase() + s.substring(1);
 	}
 	
-	/**
-	 * 转换成标题命名形式。
-	 * @return
-	 */
 	public String titlecase(){
-		if(Support.string(target).blank())
-			return target;
+		if(Support.string(source).blank())
+			return source;
 		
-		target = underscore();
-		StringBuffer sbf = new StringBuffer(target);
+		source = underscore();
+		StringBuffer sbf = new StringBuffer(source);
 		p = Pattern.compile("_[a-zA-Z0-9]{1}");
-		m = p.matcher(target);
+		m = p.matcher(source);
 		while(m.find()){
 			sbf.delete(m.start(),m.end());
 			sbf.insert(m.start(),m.group().replaceAll("_"," ").toUpperCase());

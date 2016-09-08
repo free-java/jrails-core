@@ -106,7 +106,6 @@ public abstract class Controller {
 					.getAttribute(Route.ROUTE_PARAMS));
 
 		serverPath = request.getServletPath();
-//		contextPath = config.getServletContext().getContextPath();
 		contextPath = request.getContextPath();
 		name = route.getController();
 		action = route.getAction();
@@ -221,13 +220,6 @@ public abstract class Controller {
 		}
 	}
 
-	/** 以下是受保护方法 **/
-
-	/**
-	 * 重写此方法可实现控制上传文件大小和文件类型限制
-	 * 
-	 * @throws Exception
-	 */
 	protected void parseDataParams() throws Exception {
 		final FileItemIterator iter = upload.getItemIterator(request);
 		upload.setHeaderEncoding(request.getCharacterEncoding());
@@ -242,11 +234,6 @@ public abstract class Controller {
 		}
 	}
 	
-	/**
-	 * 重写此方法可实现对请求参数重新编码。
-	 * @param param
-	 * @return
-	 */
 	protected String encoding(String param) {
 		if (isPost){
 			return param;
@@ -260,31 +247,14 @@ public abstract class Controller {
 		}
 	}
 
-
-	/** 以下是公用方法 **/
-
-	/**
-	 * 获取请求路由。
-	 * @return
-	 */
 	public Route getRoute() {
 		return route;
 	}
 
-	/**
-	 * 获取客户端浏览器UserAgent字符串。
-	 * @return
-	 */
 	public UserAgentWorker getUserAgent() {
 		return userAgent;
 	}
-		
-	/**
-	 * 下载文件。
-	 * @param is
-	 * @param filename 重新指定文件名称
-	 * @throws IOException
-	 */
+
 	public void file(InputStream is, String filename) throws IOException {
 		if (route.isActive()) {
 			route.setActive(false);
@@ -316,52 +286,23 @@ public abstract class Controller {
 		}
 	}
 
-	/**
-	 * 下载文件。
-	 * @param data 文件的Bytes形式
-	 * @param filename 重新指定文件名称
-	 * @throws IOException
-	 */
 	public void file(byte[] data, String filename) throws IOException {
 		file(new ByteArrayInputStream(data), filename);
 	}
 
-	/**
-	 * 下载文件。
-	 * @param file
-	 * @param filename 重新指定文件名称
-	 * @throws IOException
-	 */
 	public void file(File file, String filename) throws IOException {
 		file(FileUtils.readFileToByteArray(file), filename);
 	}
 
-	/**
-	 * 下载文件。
-	 * @param file
-	 * @throws IOException
-	 */
 	public void file(File file) throws IOException {
 		file(file, file.getName());
 	}
 
-	/**
-	 * 跳转到另一个路由(同一请求,浏览器URL不会发生变化)。
-	 * @param route
-	 * @throws IOException
-	 * @throws ServletException
-	 */
 	public void forwardRoute(String route) throws IOException, ServletException {
 		Route r = new Route(request, route);
 		forward(r.getController(), r.getAction());
 	}
 
-	/**
-	 * 跳转到另一个路由(新的请求,浏览器URL会发生变化)。
-	 * @param route
-	 * @param qs
-	 * @throws IOException
-	 */
 	public void redirectRoute(String route, QueryString qs) throws IOException {
 		Route r = new Route(request, route);
 		QueryString q = new QueryString();
@@ -372,22 +313,10 @@ public abstract class Controller {
 		redirect(r.getController(), r.getAction(), q);
 	}
 
-	/**
-	 * 渲染到页面(对应view/controName/action.jsp)。
-	 * @throws IOException
-	 * @throws ServletException
-	 */
 	public void render() throws IOException, ServletException {
 		render(name, action);
 	}
 
-	/**
-	 * 渲染到页面(对应view/path/action.jsp)。
-	 * @param path
-	 * @param action
-	 * @throws IOException
-	 * @throws ServletException
-	 */
 	public void render(String path, String action) throws IOException,
 			ServletException {
 		if (route.isActive()) {
@@ -399,13 +328,6 @@ public abstract class Controller {
 		}
 	}
 
-	/**
-	 * 跳转到另一个Action(同一请求,浏览器URL不会发生变化)。
-	 * @param controller
-	 * @param action
-	 * @throws IOException
-	 * @throws ServletException
-	 */
 	public void forward(String controller, String action) throws IOException,
 			ServletException {
 		if (route.isActive()) {
@@ -417,23 +339,10 @@ public abstract class Controller {
 		}
 	}
 
-	/**
-	 * 跳转到另一个Action(同一请求,浏览器URL不会发生变化)。
-	 * @param action
-	 * @throws IOException
-	 * @throws ServletException
-	 */
 	public void forward(String action) throws IOException, ServletException {
 		forward(name, action);
 	}
 
-	/**
-	 * 跳转到另一个Action(同一请求,浏览器URL不会发生变化)。
-	 * @param controller
-	 * @param action
-	 * @param qs
-	 * @throws IOException
-	 */
 	public void redirect(String controller, String action, QueryString qs)
 			throws IOException {
 		String qstr = "";
@@ -444,21 +353,10 @@ public abstract class Controller {
 				controller, action, qstr));
 	}
 
-	/**
-	 * 重定向到另一个Action(URL被重写)。
-	 * @param action
-	 * @param qs
-	 * @throws IOException
-	 */
 	public void redirect(String action, QueryString qs) throws IOException {
 		redirect(name, action, qs);
 	}
 
-	/**
-	 * 重定向到另一个Action(URL被重写)。
-	 * @param url
-	 * @throws IOException
-	 */
 	public void redirect(String url) throws IOException {
 		if (route.isActive()) {
 			route.setActive(false);
@@ -467,13 +365,6 @@ public abstract class Controller {
 		}
 	}
 
-	/**
-	 * 
-	 * @param status
-	 *            301 or 302
-	 * @param url
-	 *            target url
-	 */
 	public void location(int status, String url) {
 		response.setStatus(status);
 		response.addHeader("Location", url);
@@ -481,23 +372,12 @@ public abstract class Controller {
 		route.setActive(false);
 	}
 
-	/**
-	 * document.write("<script>...</script>")
-	 * 
-	 * @param url
-	 * @throws IOException
-	 */
 	public void location(String url) throws IOException {
 		out().write(
 				"document.write(\"<script>window.location.href='" + url
 						+ "';</script>\");");
 	}
 
-	/**
-	 * 向客户端输出流。
-	 * @return PrintWriter
-	 * @throws IOException
-	 */
 	public PrintWriter out() throws IOException {
 		if (route.isActive()) {
 			route.setActive(false);
@@ -508,19 +388,10 @@ public abstract class Controller {
 			return null;
 	}
 
-	/**
-	 * 设置request级别的属性，可以页面获取。
-	 * @param key
-	 * @param value
-	 */
 	public void set(String key, Object value) {
 		request.setAttribute(key, value);
 	}
 
-	/**
-	 * 设置request级别的属性，可以页面获取。
-	 * @param model
-	 */
 	public void bind(ActiveRecord model) {
 		List<String> att = null;
 		att = model.getAttributes();
@@ -533,10 +404,6 @@ public abstract class Controller {
 		set(model.getClass().getSimpleName(), m);
 	}
 
-	/**
-	 * 设置request级别的属性，可以页面获取。
-	 * @param params
-	 */
 	public void bind(Map<String, Object> params) {
 		final List<String> att = Support.map(params).keys();
 		String key;
@@ -577,24 +444,6 @@ public abstract class Controller {
 	public Map<String, Object> getParams() {
 		return params;
 	}
-
-//	public Object getValue(String name, Object def) {
-//		return Support.map(params).get(name, def);
-//	}
-//
-//	public Number getNumber(String name, Number def) {
-//		Object v = getValue(name, def);
-//		if (v == null)
-//			return null;
-//		else if (v instanceof String) {
-//			try {
-//				return new DecimalFormat().parse(v.toString());
-//			} catch (ParseException e) {
-//				return def;
-//			}
-//		}
-//		return (Number) v;
-//	}
 
 	public Map<String, Object> getQueies() {
 		return queies;
@@ -654,111 +503,47 @@ public abstract class Controller {
 			return parseJsonArray(name);
 	}
 	
-	/**
-	 * 获取Json Array字符串格式的参数
-	 * @param name 参数名称
-	 * @return
-	 */
 	public List<Object> parseJsonArray(String name){
 		return (List<Object>)Json.parse(parseString(name));
 	}
-	
-	/**
-	 * 获取Json Array字符串格式的参数
-	 * @param name 参数名称
-	 * @param def 默认值
-	 * @return
-	 */
+
 	public List<Object> parseJsonArray(String name,String def){
 		return (List<Object>)Json.parse(parseString(name,def));
 	}
 	
-	/**
-	 * 获取Json字符串格式的参数
-	 * @param name 参数名称
-	 * @return
-	 */
 	public Map<String,Object> parseJson(String name){
 		return (Map<String,Object>)Json.parse(parseString(name));
 	}
 	
-	/**
-	 * 获取Json字符串格式的参数
-	 * @param name 参数名称
-	 * @param def 默认值
-	 * @return
-	 */
 	public Map<String,Object> parseJson(String name,String def){
 		return (Map<String,Object>)Json.parse(parseString(name,def));
 	}
 
-	/**
-	 * 获取请求参数(String类型)。
-	 * @param name 参数名称
-	 * @param def 默认值
-	 * @return
-	 */
 	public String parseString(String name, String def) {
 		return Support.string(parseString(name)).def(def);
 	}
 
-	/**
-	 * 获取请求参数(String类型)。
-	 * @param name 参数名称
-	 * @return String
-	 */
 	public String parseString(String name) {
 		return (String) params.get(name);
 	}
 
-	/**
-	 * 获取请求参数(Number类型)。
-	 * @param name 参数名称
-	 * @param def 默认值
-	 * @return Number
-	 * @throws ParseException
-	 */
 	public Number parseNumber(String name, Number def) throws ParseException {
 		DecimalFormat df = new DecimalFormat();
 		return df.parse(parseString(name, def.toString()));
 	}
 
-	/**
-	 *  获取请求参数(Number类型)。
-	 * @param name 参数名称
-	 * @return Number
-	 * @throws ParseException
-	 */
 	public Number parseNumber(String name) throws ParseException {
 		return parseNumber(name, null);
 	}
 
-	/**
-	 * 获取请求参数(Boolean类型)。
-	 * @param name 参数名称
-	 * @param def 默认值
-	 * @return Boolean
-	 */
 	public Boolean parseBoolean(String name, Boolean def) {
 		return Boolean.parseBoolean(parseString(name));
 	}
 
-	/**
-	 * 获取请求参数(Boolean类型)。
-	 * @param name 参数名称
-	 * @return Boolean
-	 */
 	public Boolean parseBoolean(String name) {
 		return parseBoolean(name, null);
 	}
 
-	/**
-	 * 获取请求参数(java.sql.Timestamp类型)。
-	 * @param name 参数名称
-	 * @param def 默认值
-	 * @return Timestamp
-	 * @throws ParseException
-	 */
 	public Timestamp parseTimestamp(String name, Timestamp def) throws ParseException {
 		SimpleDateFormat df = new SimpleDateFormat(getGlobal().t("formates",
 				"datetime"));
@@ -769,23 +554,10 @@ public abstract class Controller {
 		return new Timestamp(d.getTime());
 	}
 
-	/**
-	 * 获取请求参数(java.sql.Timestamp类型)。
-	 * @param name 参数名称
-	 * @return Timestamp
-	 * @throws ParseException
-	 */
 	public Timestamp parseTimestamp(String name) throws ParseException {
 		return parseTimestamp(name, null);
 	}
 
-	/**
-	 * 获取请求参数(java.sql.Date类型)。
-	 * @param name 参数名称
-	 * @param def 默认值
-	 * @return Date
-	 * @throws ParseException
-	 */
 	public Date parseDate(String name, Date def) throws ParseException {
 		SimpleDateFormat df = new SimpleDateFormat(getGlobal().t("formates",
 				"date"));
@@ -796,23 +568,10 @@ public abstract class Controller {
 		return new Date(d.getTime());
 	}
 
-	/**
-	 * 获取请求参数(java.sql.Date类型)。
-	 * @param name 参数名称
-	 * @return Date
-	 * @throws ParseException
-	 */
 	public Date parseDate(String name) throws ParseException {
 		return parseDate(name, null);
 	}
 
-	/**
-	 * 获取请求参数(java.sql.Time类型)。
-	 * @param name 参数名称
-	 * @param def 默认值
-	 * @return Time
-	 * @throws ParseException
-	 */
 	public Time parseTime(String name, Time def) throws ParseException {
 		SimpleDateFormat df = new SimpleDateFormat(getGlobal().t("formates",
 				"time"));
@@ -823,21 +582,10 @@ public abstract class Controller {
 		return new Time(d.getTime());
 	}
 
-	/**
-	 * 获取请求参数(java.sql.Time类型)。
-	 * @param name 参数名称
-	 * @return Time
-	 * @throws ParseException
-	 */
 	public Time parseTime(String name) throws ParseException {
 		return parseTime(name, null);
 	}
 
-	/**
-	 * 向客户端响应文本内容。
-	 * @param text
-	 * @throws IOException
-	 */
 	public void text(String text) throws IOException {
 		if (route.isActive()) {
 			route.setActive(false);
@@ -848,12 +596,6 @@ public abstract class Controller {
 		}
 	}
 	
-	/**
-	 * 向客户端响应文本内容。
-	 * @param contentType (e.g. text/css , text/javascript, text/html) 
-	 * @param text
-	 * @throws IOException
-	 */
 	public void text(String contentType,String text) throws IOException {
 		if (route.isActive()) {
 			route.setActive(false);
@@ -865,11 +607,6 @@ public abstract class Controller {
 		}
 	}
 	
-	/**
-	 * 向客户端响应Json。
-	 * @param text
-	 * @throws IOException
-	 */
 	public void json(Json<String,Object> json) throws IOException {
 		if (route.isActive()) {
 			route.setActive(false);
@@ -878,11 +615,6 @@ public abstract class Controller {
 		}
 	}
 
-	/**
-	 * 向客户端发出一个错误响应代码。
-	 * @param code 错误代码
-	 * @throws IOException
-	 */
 	public void sendError(int code) throws IOException {
 		if (route.isActive()) {
 			log.debug("SendError : " + code);
@@ -892,12 +624,6 @@ public abstract class Controller {
 		}
 	}
 
-	/**
-	 * 向客户端发出一个错误响应代码和错误内容。
-	 * @param code 错误代码
-	 * @param text 错误内容
-	 * @throws IOException
-	 */
 	public void sendError(int code, String text) throws IOException {
 		if (route.isActive()) {
 			log.debug("SendError : " + code + "," + text);
