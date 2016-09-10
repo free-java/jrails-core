@@ -32,10 +32,10 @@ public final class DBResource {
 		String adaName = null;
 		if(Support.map(db).gets(env,rw) == null){
 			dbcnf = Support.map(db).gets(env);
-			adaName = (String)Support.map(db).gets(env,"adapter");
+			adaName = Support.map(db).gets(env,"adapter");
 		}else{
 			dbcnf = Support.map(db).gets(env,rw);
-			adaName = (String)Support.map(db).gets(env,rw,"adapter");
+			adaName = Support.map(db).gets(env,rw,"adapter");
 		}
 		try {
 			Class<Adapter> cls = null;
