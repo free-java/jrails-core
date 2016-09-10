@@ -12,7 +12,7 @@ import javax.xml.bind.DatatypeConverter;
 import org.apache.commons.io.FileUtils;
 
 import app.model.Account;
-import net.rails.active_record.Database;
+import net.rails.active_record.DBResource;
 import net.rails.ciphertext.Ciphertext;
 import net.rails.ciphertext.Ciphertext.DESWorker;
 import net.rails.ciphertext.Ciphertext.ThreeDESWorker;
@@ -60,10 +60,10 @@ public class DBConnectionTest
         	a.put("age","22");
         	a.onSave();
         	
-        	Account a1  = new Account(g);
+        	Account a1  = new Account(g,"1k0padyd2h0z1973");
         	a1.useTransaction();
-        	a1.setId(Support.code().id());
-        	a1.put("name","jack 2");
+//        	a1.setId(Support.code().id());
+        	a1.put("name","jack ");
         	a1.put("age","33");
         	a1.onSave();
         	

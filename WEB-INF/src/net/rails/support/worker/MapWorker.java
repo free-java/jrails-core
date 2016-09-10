@@ -29,34 +29,13 @@ public class MapWorker<K,V> {
 		return new ArrayList<K>(((Collection<? extends K>) source.keySet()));
 	}
 
-	@SuppressWarnings("unchecked")
-	public Object gets(String keys) {
-		Object o = null;
-		if (source == null)
-			return null;
-
-		Map<K, V> m = (Map<K, V>) source;
-		String[] keyarr = keys.split("[:|\\.|/|\\\\]");
-		for (int i = 0; i < keyarr.length; i++) {
-			o = m.get(keyarr[i]);
-			if (o == null) {
-				break;
-			} else {
-				if (o instanceof Map) {
-					m = (Map<K, V>) o;
-					continue;
-				} else {
-					if (i != keyarr.length - 1)
-						o = null;
-				}
-			}
-		}
-		return o;
+	public <V> V gets(String keys) {
+		return gets(keys.split("[:|\\.|/|\\\\]"));
 	}
 
 	@SuppressWarnings("unchecked")
-	public Object gets(String... keyarr) {
-		Object o = null;
+	public <V> V gets(String... keyarr) {
+		V o = null;
 		if (source == null)
 			return null;
 		

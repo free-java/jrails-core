@@ -1,5 +1,6 @@
 package net.rails.active_record;
 
+import java.net.InetAddress;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -8,13 +9,13 @@ import org.slf4j.LoggerFactory;
 import net.rails.support.Support;
 import net.rails.support.worker.AbsConfigWorker;
 
-public class Database {
+public final class DBResource {
 	
-	private Logger log = LoggerFactory.getLogger(Database.class);
+	private Logger log = LoggerFactory.getLogger(DBResource.class);
 	
 	private final static AbsConfigWorker configur = Support.config().getConfig();
-	public final static String READER = "_reader";
-	public final static String WRITER = "_writer";
+	public final static String READER = "reader";
+	public final static String WRITER = "writer";
 	
 	private String env;	
 	private String model;
@@ -23,25 +24,25 @@ public class Database {
 	protected Map<String,Object> db;	
 	
 	@SuppressWarnings("unchecked")
-	public Database(String model,String rw){
+	public DBResource(String model,String rw){
 		super();
 		this.model = model;
 		db = configur.get("database");
-		env = getEnvEachValue(model,"env","Production").toString();
+		env = getEnv(model).toString();
 		String adaName = null;
-		if(db.containsKey(env + rw)){
-			dbcnf = (Map<String, Object>) db.get(env + rw);
-			adaName = (String)Support.map(db).gets(env + rw,"adapter");
-		}else{
-			dbcnf = (Map<String, Object>) db.get(env);
+		if(Support.map(db).gets(env,rw) == null){
+			dbcnf = Support.map(db).gets(env);
 			adaName = (String)Support.map(db).gets(env,"adapter");
-		}		
+		}else{
+			dbcnf = Support.map(db).gets(env,rw);
+			adaName = (String)Support.map(db).gets(env,rw,"adapter");
+		}
 		try {
-			Class cls = null;
+			Class<Adapter> cls = null;
 			if(adaName == null){
 				cls = Adapter.class;
 			}else{
-				cls = Class.forName(adaName);
+				cls = (Class<Adapter>) Class.forName(adaName);
 			}
 			adapter = (Adapter) cls.getConstructor(Map.class,String.class).newInstance(dbcnf,this.model);			
 		} catch (Exception e) {
@@ -61,18 +62,31 @@ public class Database {
 		return adapter;
 	}
 	
-	protected Object getEnvEachValue(String model,String key,Object def){
+	protected String getEnv(String model){
+		String key = "env";
 		Map<String,Object> modcnf = Support.config().getModels().get(model);
 		Object value = null;
 		if(modcnf != null && modcnf.containsKey(key)){
-				value = modcnf.get(key);
-		}else{
-			value = Support.config().getConfig().get("env").get(key);
-			if(value == null){
-				value = def;
+			value = modcnf.get(key);
+			if(value instanceof Map){
+				Map<String,String> o = (Map<String,String>)value;
+				value = o.get(getHostname());
 			}
-		}		
-		return value;
+		}else{
+			value = Support.env().getEnv();
+		}
+		return (String)value;
+	}
+	
+	private String getHostname() {
+		try {
+			InetAddress addr;
+			addr = InetAddress.getLocalHost();
+			return addr.getHostName();
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+			return null;
+		}
 	}
 	
 }

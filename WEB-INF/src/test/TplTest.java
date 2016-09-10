@@ -12,7 +12,7 @@ import javax.xml.bind.DatatypeConverter;
 import org.apache.commons.io.FileUtils;
 
 import app.model.Account;
-import net.rails.active_record.Database;
+import net.rails.active_record.DBResource;
 import net.rails.ciphertext.Ciphertext;
 import net.rails.ciphertext.Ciphertext.DESWorker;
 import net.rails.ciphertext.Ciphertext.ThreeDESWorker;

@@ -19,7 +19,7 @@ import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
-import net.rails.active_record.Database;
+import net.rails.active_record.DBResource;
 import net.rails.ciphertext.Ciphertext;
 import net.rails.ciphertext.Ciphertext.DESWorker;
 import net.rails.ciphertext.Ciphertext.ThreeDESWorker;
@@ -118,7 +118,7 @@ public class AppTest
     
     public void testApp2()
     {
-		Database db = new Database("Robot",Database.WRITER);
+		DBResource db = new DBResource("Robot",DBResource.WRITER);
 		System.out.println("----" + db.getDbcnf());
 //    	System.out.println(getEnvEachValue("Robot","env","Production").toString());
     }

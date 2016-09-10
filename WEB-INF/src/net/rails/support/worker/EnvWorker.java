@@ -1,11 +1,18 @@
 package net.rails.support.worker;
 
+import java.net.InetAddress;
 import java.util.List;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.rails.support.Support;
 
 @SuppressWarnings("unchecked")
 public final class EnvWorker {
+	
+	private Logger log = LoggerFactory.getLogger(EnvWorker.class);
 	
 	public EnvWorker(){
 		super();
@@ -52,7 +59,12 @@ public final class EnvWorker {
 	}
 	
 	public String getEnv(){
-		return getString("env","production");
+		Object value =  get("env");
+		if(value instanceof Map){
+			Map<String,String> o = (Map<String,String>)value;
+			value = o.get(getHostname());
+		}
+		return (String)value;
 	}
 	
 	public String getPrefix(){
@@ -85,6 +97,17 @@ public final class EnvWorker {
 	
 	public Object gets(String...keyarr){
 		return Support.map(getRoot()).gets(keyarr);
+	}
+	
+	private String getHostname() {
+		try {
+			InetAddress addr;
+			addr = InetAddress.getLocalHost();
+			return addr.getHostName();
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+			return null;
+		}
 	}
 
 }

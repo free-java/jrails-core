@@ -198,10 +198,10 @@ public abstract class ActiveRecord extends IndexMap<String, Object> {
 	}
 
 	protected void initAdapter() {
-		readerAdapter = new Database(getClass().getSimpleName(),
-				Database.READER).getAdapter();
-		writerAdapter = new Database(getClass().getSimpleName(),
-				Database.WRITER).getAdapter();
+		readerAdapter = new DBResource(getClass().getSimpleName(),
+				DBResource.READER).getAdapter();
+		writerAdapter = new DBResource(getClass().getSimpleName(),
+				DBResource.WRITER).getAdapter();
 	}
 
 	protected void find(Object id) throws SQLException, RecordNotFoundException {		
@@ -1132,7 +1132,7 @@ public abstract class ActiveRecord extends IndexMap<String, Object> {
 	@SuppressWarnings("unchecked")
 	public static <T extends ActiveRecord> List<T> find(T t, SqlWorker sql)
 			throws SQLException {
-		Database database = new Database(t.getClass().getSimpleName(),Database.READER);
+		DBResource database = new DBResource(t.getClass().getSimpleName(),DBResource.READER);
 		Adapter adapter = database.getAdapter();
 		List<T> list = new ArrayList<T>();
 		List<Map<String, Object>> ls = adapter.find(sql);

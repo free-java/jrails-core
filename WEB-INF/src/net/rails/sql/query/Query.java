@@ -1443,8 +1443,6 @@ public class Query implements Cloneable {
 						v = new Timestamp(new Date().getTime());
 					else if(sv.equals("@today"))
 						v = new java.sql.Date(new Date().getTime());
-//					else if(sv.equals("@thisyear"))  //@thisyear-1 , @thisyear+1 ,@minute + 1,@thisyear-1 @q1,@q2,@q3
-//						v = new java.sql.Date(new Date().getTime());
 					else if(Support.string(sv).isDateFormat(g.t("formats","datetime")))
 						v = g.text2datetime(value.toString());
 					else if(Support.string(sv).isDateFormat(g.t("formats","date")))

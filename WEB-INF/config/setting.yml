@@ -1,0 +1,4 @@
+template_path: 'D:/template/'
+solution_path: 'D:/solution/'
+ext_url: 'http://localhost:8080/cdn/ext/ext-4.2.1.883'
+js_url: 'http://localhost:8080/cdn'

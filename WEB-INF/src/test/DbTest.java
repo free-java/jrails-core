@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import app.model.Account;
 import net.rails.active_record.Adapter;
-import net.rails.active_record.Database;
+import net.rails.active_record.DBResource;
 import net.rails.ciphertext.Ciphertext;
 import net.rails.ciphertext.Ciphertext.DESWorker;
 import net.rails.ciphertext.Ciphertext.ThreeDESWorker;
