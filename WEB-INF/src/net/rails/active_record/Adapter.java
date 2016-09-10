@@ -456,21 +456,22 @@ public class Adapter {
 	
 	private Connection openQueryConnection() throws SQLException{		
 		log.debug("Open Qyery Connection");
-		Connection connection = dataSource.getConnection();
-		connection.setAutoCommit(true);
-		return connection;
+		return dataSource.getConnection();
 	}
 	
 	private void closeQueryConnection(ResultSet result,PreparedStatement statement,Connection connection) {
-		log.debug("Close Query Connection");
+		
 		try{
 			if (result != null){
+				log.debug("Close Query Result");
 				result.close();
 			}
 			if (statement != null){
+				log.debug("Close Query Statement");
 				statement.close();
 			}
 			if (connection != null){
+				log.debug("Close Query Connection");
 				connection.close();
 			}
 		}catch(SQLException e){
@@ -480,12 +481,13 @@ public class Adapter {
 	
 	private void closeConnection(PreparedStatement statement,Connection connection) {
 		if(isAutoCommit()){
-			log.debug("Close Connection");
 			try{
 				if (statement != null){
+					log.debug("Close Statement");
 					statement.close();
 				}
 				if (connection != null){
+					log.debug("Close Connection");
 					connection.close();
 				}
 			}catch(SQLException e){

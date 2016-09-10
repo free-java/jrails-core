@@ -18,6 +18,7 @@ import net.rails.ciphertext.Ciphertext.DESWorker;
 import net.rails.ciphertext.Ciphertext.ThreeDESWorker;
 import net.rails.ciphertext.exception.CiphertextException;
 import net.rails.ext.AbsGlobal;
+import net.rails.sql.query.Query;
 import net.rails.support.Support;
 //import net.rails.log.Log;
 import net.rails.tpl.Tpl;
@@ -46,6 +47,31 @@ public class DBConnectionTest
     public static Test suite()
     {
         return new TestSuite( DBConnectionTest.class );
+    }
+    
+    public void testMaxConnections() throws IOException
+    {
+    	try{
+        	g.setLocale("default");
+        	for(int i = 0;i < 100000;i++){
+        		try{
+            		Query q = new Query(new Account(g));
+                	Account a = q.first();
+//            		Account a = new Account(g);
+//                	a.setId(Support.code().id());
+//                	a.put("name","jack");
+//                	a.put("age","22");
+//                	a.onSave();
+                	System.out.println( i + "-"+ a);
+        		}catch(Exception e){
+        			e.printStackTrace();
+        		}
+        	}
+            assertTrue( true );
+    	}catch(Exception e){
+    		e.printStackTrace();
+    	}
+
     }
 
     public void testApp() throws IOException
