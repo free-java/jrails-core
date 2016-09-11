@@ -1,0 +1,8 @@
+
+deploy_bin_path: '/usr/local/src/deploy_bin/'
+template_path: '/usr/local/src/free-template/'
+solution_path: '/usr/local/src/solution/'
+core_lib_path: '/usr/local/src/lib/core_lib/'
+
+java: 
+  jdk8: '/usr/local/java/default/'

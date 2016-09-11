@@ -19,7 +19,7 @@ import net.rails.support.Support;
 @SuppressWarnings("unchecked")
 public abstract class AbsConfigWorker {
 	
-	public abstract Map<String,Map<String,Object>> getConfs();
+	public abstract <K,V> Map<String,Map<K,V>> getConfs();
 	protected abstract String getResource();
 	protected Logger log;
 	
@@ -32,12 +32,11 @@ public abstract class AbsConfigWorker {
 		log = LoggerFactory.getLogger(getClass());
 	}
 
-	public Map<String, Object> get(String key) {				
-		return getConfs().get(key);
+	public <K,V> Map<K, V> get(String key) {				
+		return (Map<K, V>) getConfs().get(key);
 	}
 	
 	public String getFolder() {	
-		URL url = null;
 		String path = null;
 		try {
 			path = new File(Define.CONFIG_PATH + "/" + getResource()).getAbsolutePath();
@@ -53,14 +52,14 @@ public abstract class AbsConfigWorker {
 		return dir.listFiles(getFilter());
 	}	
 	
-	public Map<String, Map<String,Object>> loadYmls(){
-		Map<String, Map<String,Object>> confs = new HashMap<String, Map<String,Object>>();
+	public <K,V> Map<String, Map<K,V>> loadYmls(){
+		Map<String, Map<K,V>> confs = new HashMap<String, Map<K,V>>();
 			try {
 				File[] files = getYmls();
 				if(files != null){					
 					for(File file : files){
 						try{
-							Map<String,Object> map = (Map<String,Object>)Yaml.load(FileUtils.readFileToString(file,Define.CONFIG_FILE_CHARSET));
+							Map<K,V> map = (Map<K,V>)Yaml.load(FileUtils.readFileToString(file,Define.CONFIG_FILE_CHARSET));
 							confs.put(file.getName().replaceFirst("(.[yY][mM][lL])$",""),map);
 						}catch(Exception e){
 							log.error("(File: "+ file.getName() +")" + e.getMessage(),e);
@@ -74,10 +73,10 @@ public abstract class AbsConfigWorker {
 			}
 	}
 	
-	public Object getValues(String file,String...keys){
-		Map<String,Object> vs = get(file);
+	public <V> V getValues(String file,String...keys){
+		Map<Object,Object> vs = get(file);
 		if(keys.length == 0)
-			return vs;
+			return (V)vs;
 		
 		int len = keys.length;
 		
@@ -86,19 +85,19 @@ public abstract class AbsConfigWorker {
 			if(vs == null)
 				return null;
 			else
-				vs = (Map<String,Object>)vs.get(key);
+				vs = (Map<Object,Object>)vs.get(key);
 		}
 		if(vs == null)
 			return null;
 		else
-			return vs.get(keys[len - 1]);
+			return (V)vs.get(keys[len - 1]);
 	}
 	
-	public Object gets(String...keyarr){
+	public <V> V gets(String...keyarr){
 		return Support.map(getConfs()).gets(keyarr);
 	}
 	
-	public Object gets(String keys){
+	public <V> V gets(String keys){
 		return Support.map(getConfs()).gets(keys);
 	}
 	

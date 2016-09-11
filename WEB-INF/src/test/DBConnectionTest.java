@@ -103,4 +103,9 @@ public class DBConnectionTest
 
     }
     
+    public void testConfig(){
+    	Map<String,String> map = Support.config("deployer","java");
+    	System.out.println(Support.config("deployer","java"));
+    }
+    
 }

@@ -80,6 +80,10 @@ public final class Support {
 		return new ConfigWorker();
 	}
 	
+	public static <K,V> Map<K,V> config(String file,String...keys){
+		return new ConfigWorker().getConfig().getValues(file, keys);
+	}
+	
 	public static ValidateMessageWorker validateMessage(AbsGlobal g,String of,String model,String attr){
 		return new ValidateMessageWorker(g,of,model,attr);
 	}

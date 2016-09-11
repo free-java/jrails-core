@@ -8,9 +8,9 @@ import net.rails.support.Support;
 
 public final class ConfigWorker {
 
-	public static Map<String, Map<String, Object>> CONFS = null;
-	public static Map<String, Map<String, Object>> MODEL_CONFS = null;
-	public static Map<String, Map<String, Object>> LOCALE_CONFS = null;
+	public static Map<String, Map<Object, Object>> CONFS = null;
+	public static Map<String, Map<Object, Object>> MODEL_CONFS = null;
+	public static Map<String, Map<Object, Object>> LOCALE_CONFS = null;
 	public static Map<String, List<Map<String, Object>>> DELETE_CONFS = null;
 	public static Map<String, List<Map<String, Object>>> DESTROY_CONFS = null;
 
@@ -21,7 +21,7 @@ public final class ConfigWorker {
 	public AbsConfigWorker getConfig() {
 		AbsConfigWorker c = new AbsConfigWorker() {
 			@Override
-			public Map<String, Map<String, Object>> getConfs() {
+			public Map<String, Map<Object, Object>> getConfs() {
 				if (CONFS == null) {
 					CONFS = this.loadYmls();
 					log.debug("{}",CONFS);
@@ -44,7 +44,7 @@ public final class ConfigWorker {
 	public AbsConfigWorker getModels() {
 		AbsConfigWorker c = new AbsConfigWorker() {
 			@Override
-			public synchronized Map<String, Map<String, Object>> getConfs() {
+			public synchronized Map<String, Map<Object, Object>> getConfs() {
 				if (MODEL_CONFS == null) {
 					MODEL_CONFS = this.loadYmls();
 				}
@@ -93,7 +93,7 @@ public final class ConfigWorker {
 	public AbsConfigWorker getLocales() {
 		AbsConfigWorker c = new AbsConfigWorker() {
 			@Override
-			public synchronized Map<String, Map<String, Object>> getConfs() {
+			public synchronized Map<String, Map<Object, Object>> getConfs() {
 				if (LOCALE_CONFS == null) {
 					LOCALE_CONFS = this.loadYmls();
 				}

@@ -25,6 +25,11 @@ public class MapWorker<K,V> {
 	}
 	
 	@SuppressWarnings("unchecked")
+	public <K,V> V get(K key){
+		return (V)source.get(key);
+	}
+	
+	@SuppressWarnings("unchecked")
 	public <K extends Object> List<K> keys() {
 		return new ArrayList<K>(((Collection<? extends K>) source.keySet()));
 	}
