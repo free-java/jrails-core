@@ -950,7 +950,7 @@ public abstract class ActiveRecord extends IndexMap<String, Object> {
 		return v.byteValue();
 	}
 	
-	public Integer getInteger(String attr,Byte def){
+	public Integer getInteger(String attr,Integer def){
 		return getNumber(attr,def).intValue();
 	}
 	
@@ -981,6 +981,10 @@ public abstract class ActiveRecord extends IndexMap<String, Object> {
 		if(v == null)
 			return null;
 		return v.floatValue();
+	}
+	
+	public Float getFloat(String attr,Float def){
+		return getNumber(attr,def).floatValue();
 	}
 	
 	public Double getDouble(String attr,Double def){
