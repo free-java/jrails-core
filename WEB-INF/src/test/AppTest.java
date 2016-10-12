@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -116,8 +117,11 @@ public class AppTest
     	System.out.println(Support.config().getConfig().get("database"));
     }
     
-    public void testApp2()
+    public void testApp2() throws UnsupportedEncodingException
     {
+    	String s = URLEncoder.encode("=", "UTF-8");
+    	System.out.println(s);
+    	System.out.println(URLDecoder.decode(s,"UTF-8"));
 		DBResource db = new DBResource(g,"Account",DBResource.WRITER);
 //		System.out.println("----" + db);
 //    	System.out.println(getEnvEachValue("Robot","env","Production").toString());
