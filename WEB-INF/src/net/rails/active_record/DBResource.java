@@ -18,6 +18,7 @@ public class DBResource {
 	public final static String READER = "reader";
 	public final static String WRITER = "writer";
 	
+	private AbsGlobal g;
 	private String env;	
 	private String model;
 	private Adapter adapter;
@@ -27,6 +28,7 @@ public class DBResource {
 	@SuppressWarnings("unchecked")
 	public DBResource(AbsGlobal g,String model,String rw){
 		super();
+		this.g = g;
 		this.model = model;
 		db = configur.get("database");
 		env = getEnv(model).toString();
