@@ -198,9 +198,9 @@ public abstract class ActiveRecord extends IndexMap<String, Object> {
 	}
 
 	protected void initAdapter() {
-		readerAdapter = new DBResource(getClass().getSimpleName(),
+		readerAdapter = new DBResource(g,getClass().getSimpleName(),
 				DBResource.READER).getAdapter();
-		writerAdapter = new DBResource(getClass().getSimpleName(),
+		writerAdapter = new DBResource(g,getClass().getSimpleName(),
 				DBResource.WRITER).getAdapter();
 	}
 
@@ -1136,7 +1136,7 @@ public abstract class ActiveRecord extends IndexMap<String, Object> {
 	@SuppressWarnings("unchecked")
 	public static <T extends ActiveRecord> List<T> find(T t, SqlWorker sql)
 			throws SQLException {
-		DBResource database = new DBResource(t.getClass().getSimpleName(),DBResource.READER);
+		DBResource database = new DBResource(t.getGlobal(),t.getClass().getSimpleName(),DBResource.READER);
 		Adapter adapter = database.getAdapter();
 		List<T> list = new ArrayList<T>();
 		List<Map<String, Object>> ls = adapter.find(sql);

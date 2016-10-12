@@ -118,8 +118,8 @@ public class AppTest
     
     public void testApp2()
     {
-		DBResource db = new DBResource("Robot",DBResource.WRITER);
-		System.out.println("----" + db.getDbcnf());
+		DBResource db = new DBResource(g,"Account",DBResource.WRITER);
+//		System.out.println("----" + db);
 //    	System.out.println(getEnvEachValue("Robot","env","Production").toString());
     }
     

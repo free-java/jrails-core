@@ -6,10 +6,11 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.rails.ext.AbsGlobal;
 import net.rails.support.Support;
 import net.rails.support.worker.AbsConfigWorker;
 
-public final class DBResource {
+public class DBResource {
 	
 	private Logger log = LoggerFactory.getLogger(DBResource.class);
 	
@@ -24,7 +25,7 @@ public final class DBResource {
 	protected Map<String,Object> db;	
 	
 	@SuppressWarnings("unchecked")
-	public DBResource(String model,String rw){
+	public DBResource(AbsGlobal g,String model,String rw){
 		super();
 		this.model = model;
 		db = configur.get("database");
