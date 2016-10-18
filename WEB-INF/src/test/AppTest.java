@@ -119,6 +119,8 @@ public class AppTest
     
     public void testApp2() throws UnsupportedEncodingException
     {
+    	File f = new File("g:/test/test/a.txt");
+    	f.getParentFile().mkdirs();
     	String s = URLEncoder.encode("=", "UTF-8");
     	System.out.println(s);
     	System.out.println(URLDecoder.decode(s,"UTF-8"));

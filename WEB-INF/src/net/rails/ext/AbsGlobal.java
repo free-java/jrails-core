@@ -49,17 +49,15 @@ public abstract class AbsGlobal {
 	}
 	
 //	@SuppressWarnings("unchecked")
-	public <T extends Object> T locale2(String[] keys){
-		if(keys == null)
-			return (T)config.getLocales().getValues(locale);
-		else if (keys.length == 1){			
-			return (T)config.getLocales().getValues(locale,keys[0].split("[,|\\.]"));
-		}else{
-			return (T)config.getLocales().getValues(locale,keys);
-		}
-		
-//		return (T) "test local2";
-	}
+//	public <T extends Object> T locale2(String[] keys){
+//		if(keys == null)
+//			return (T)config.getLocales().getValues(locale);
+//		else if (keys.length == 1){			
+//			return (T)config.getLocales().getValues(locale,keys[0].split("[,|\\.]"));
+//		}else{
+//			return (T)config.getLocales().getValues(locale,keys);
+//		}
+//	}
 	
 	public String t(String...keys){
 		String v = (String)locale(keys);
