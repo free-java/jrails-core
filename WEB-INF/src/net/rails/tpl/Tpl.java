@@ -173,6 +173,10 @@ public class Tpl implements ReferenceInsertionEventHandler,NullSetEventHandler, 
 						String model = res[0];
 						Map<String,Object> attrCnfs = Support.config().getModels().get(model);						
 						Map<String,Object> attrs = (Map<String, Object>) attrCnfs.get("attributes");
+						if(attrs == null){
+							attrs = new HashMap<String,Object>();
+							log.debug("{}.yml require \"attribute\"",model);
+						}
 						List<String> attrsKey = Support.map(attrs).keys();
 						Map<String,Object> attrCnf = null;
 						for(String attr : attrsKey){
