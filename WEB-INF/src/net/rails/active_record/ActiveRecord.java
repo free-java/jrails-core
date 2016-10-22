@@ -489,68 +489,70 @@ public abstract class ActiveRecord extends IndexMap<String, Object> {
 	 */
 	public boolean update() throws SQLException, ValidateException,
 			ConfigurException, TypeException {
-		List<String> keys = Support.map(this).keys();
-		List<String> attrs = getAttributes();
-		boolean updated = false;
-		for (String key : keys) {
-			if (!attrs.contains(key))
-				continue;
-
-			if (!Arrays.asList(writerAdapter.getPrimaryKey(),
-					"created_user_id", "updated_user_id", "deleted_user_id",
-					"created_at", "updated_at", "deleted_at", "deleted")
-					.contains(key)) {
-				Attribute a = getAttribute(key);
-				Object ov = a.parse(beforeRecord.get(key));
-				Object cv = get(key);
-				Object pv = a.parse(cv);
-
-				if (pv == null) {
-					if (ov != null) {
-						updated = true;
-						pv = saveTrigger(key,pv,ov);
-						pv = updateTrigger(key,pv,ov);						
-						updateValues.put(key, pv);
-					}
-				} 
-				else {
-					if (!pv.equals(ov)) {
-						updated = true;		
-						pv = saveTrigger(key,pv,ov);
-						pv = updateTrigger(key,pv,ov);						
-						updateValues.put(key, pv);
+		if(beforeUpdate()){
+			List<String> keys = Support.map(this).keys();
+			List<String> attrs = getAttributes();
+			boolean updated = false;
+		
+			for (String key : keys) {
+				if (!attrs.contains(key))
+					continue;
+	
+				if (!Arrays.asList(writerAdapter.getPrimaryKey(),
+						"created_user_id", "updated_user_id", "deleted_user_id",
+						"created_at", "updated_at", "deleted_at", "deleted")
+						.contains(key)) {
+					Attribute a = getAttribute(key);
+					Object ov = a.parse(beforeRecord.get(key));
+					Object cv = get(key);
+					Object pv = a.parse(cv);
+	
+					if (pv == null) {
+						if (ov != null) {
+							updated = true;
+							pv = saveTrigger(key,pv,ov);
+							pv = updateTrigger(key,pv,ov);						
+							updateValues.put(key, pv);
+						}
+					} 
+					else {
+						if (!pv.equals(ov)) {
+							updated = true;		
+							pv = saveTrigger(key,pv,ov);
+							pv = updateTrigger(key,pv,ov);						
+							updateValues.put(key, pv);
+						}
 					}
 				}
 			}
-		}
+		
+			if (updated) {
+				log.debug("Update Atts : " + updateValues);			
+				updateValues.remove("created_user_id");
+				updateValues.remove("deleted_user_id");
+				updateValues.remove("created_at");
+				updateValues.remove("deleted_at");
+		
+				saveAction = ON_UPDATE;
+				if(!valid){
+					List<String> vkeys = Support.map(updateValues).keys();
+					validates(ON_UPDATE, updateValues,vkeys);
+				}
+				if (attrs.contains("updated_at"))
+					updateValues.put("updated_at",
+							new Timestamp(new java.util.Date().getTime()));
 	
-		if (updated) {
-			log.debug("Update Atts : " + updateValues);			
-			updateValues.remove("created_user_id");
-			updateValues.remove("deleted_user_id");
-			updateValues.remove("created_at");
-			updateValues.remove("deleted_at");
+				if (attrs.contains("updated_user_id"))
+					updateValues.put("updated_user_id", g.getUserId());
 	
-			saveAction = ON_UPDATE;
-			if(!valid){
-				List<String> vkeys = Support.map(updateValues).keys();
-				validates(ON_UPDATE, updateValues,vkeys);
-			}
-			if (attrs.contains("updated_at"))
-				updateValues.put("updated_at",
-						new Timestamp(new java.util.Date().getTime()));
-
-			if (attrs.contains("updated_user_id"))
-				updateValues.put("updated_user_id", g.getUserId());
-
-			Object id = getId();			
-			remove(writerAdapter.getPrimaryKey());
-			UpdateWorker worker = Sql.update(this, updateValues);
-			worker.wheres().add(String.format("%s.%s = :_id",
-					writerAdapter.quoteSchemaAndTableName(),
-					writerAdapter.quotePrimaryKey()));
-			worker.params().put("_id", id);
-			if(beforeUpdate()){
+				Object id = getId();			
+				remove(writerAdapter.getPrimaryKey());
+				UpdateWorker worker = Sql.update(this, updateValues);
+				worker.wheres().add(String.format("%s.%s = :_id",
+						writerAdapter.quoteSchemaAndTableName(),
+						writerAdapter.quotePrimaryKey()));
+				worker.params().put("_id", id);
+			
 				boolean b = writerAdapter.execute(Sql.sql(worker.getSql(), worker
 						.params())) > 0;
 				setId(id);

@@ -21,24 +21,13 @@ import net.rails.support.Support;
 import net.rails.web.ApplicationListener;
 
 public final class JobWorker {
-
-	public static Scheduler GLOBAL_SCHEDULER;
-
-	static {
-		StdSchedulerFactory factory = new StdSchedulerFactory();
-		try {
-			GLOBAL_SCHEDULER = factory.getScheduler();
-		} catch (SchedulerException e) {
-			LoggerFactory.getLogger(ApplicationListener.class).error(e.getMessage(), e);
-		}
-	}
 	
 	public DefaultScheduleWorker defaultSchedule(AbsGlobal g){
 		return new DefaultScheduleWorker(g) {
 			final List<JobObject> SCHEDULE_JOBS = new ArrayList<JobObject>();
 			@Override
 			public List<JobObject> getScheduleJobs() {
-				JobObject jobWorker = new JobObject();
+				JobObject jobObject = new JobObject();
 				Object o = Support.env().get("jobs");
 				if (o instanceof List) {
 					List<Map<String, Object>> jobs = (List<Map<String, Object>>) o;
@@ -51,15 +40,15 @@ public final class JobWorker {
 						String jobGroup = "DEFAULT_JOB_GROUP";
 						String triggerGroup = "DEFAULT_TRIGGER_GROUP";
 						String triggerName = "Trigger_" + jobName;
-						jobWorker = new JobObject();
-						jobWorker.setClassify(jobClass);
-						jobWorker.setCronExpression(cronExpression);
-						jobWorker.setJobGroup(jobGroup);
-						jobWorker.setJobName(jobName);
-						jobWorker.setTriggerGroup(triggerGroup);
-						jobWorker.setTriggerName(triggerName);
-						jobWorker.setHostnames(hostnames);
-						SCHEDULE_JOBS.add(jobWorker);
+						jobObject = new JobObject();
+						jobObject.setClassify(jobClass);
+						jobObject.setCronExpression(cronExpression);
+						jobObject.setJobGroup(jobGroup);
+						jobObject.setJobName(jobName);
+						jobObject.setTriggerGroup(triggerGroup);
+						jobObject.setTriggerName(triggerName);
+						jobObject.setHostnames(hostnames);
+						SCHEDULE_JOBS.add(jobObject);
 					}
 				}
 				return SCHEDULE_JOBS;
@@ -76,12 +65,12 @@ public final class JobWorker {
 						String currentTriggerName = null;
 						String currentTriggerGroup = null;
 						for (Iterator<JobObject> iterator = SCHEDULE_JOBS.iterator(); iterator.hasNext();) {
-							JobObject jobWorker = iterator.next();
-							List<String> hosts = Arrays.asList(jobWorker.getHostnames().split(","));
+							JobObject jobObject = iterator.next();
+							List<String> hosts = Arrays.asList(jobObject.getHostnames().split(","));
 							local = getHostname();
 							currentTriggerGroup = trigger.getKey().getGroup();
 							currentTriggerName = trigger.getKey().getName();
-							if (currentTriggerGroup.equals(jobWorker.getTriggerGroup()) && currentTriggerName.equals(jobWorker.getTriggerName())) {
+							if (currentTriggerGroup.equals(jobObject.getTriggerGroup()) && currentTriggerName.equals(jobObject.getTriggerName())) {
 								if (hosts.contains("%") || hosts.contains(local)) {
 									veto = false;
 								} else {

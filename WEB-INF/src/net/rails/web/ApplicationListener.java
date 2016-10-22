@@ -2,7 +2,11 @@ package net.rails.web;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
@@ -11,11 +15,15 @@ import org.apache.log4j.PropertyConfigurator;
 import org.quartz.CronScheduleBuilder;
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
+import org.quartz.JobKey;
 import org.quartz.JobListener;
+import org.quartz.Scheduler;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
+import org.quartz.TriggerKey;
 import org.quartz.TriggerListener;
 import org.quartz.impl.StdSchedulerFactory;
+import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +32,6 @@ import net.rails.ext.AbsGlobal;
 import net.rails.support.Support;
 import net.rails.support.job.worker.DefaultScheduleWorker;
 import net.rails.support.job.worker.JobObject;
-import net.rails.support.job.worker.JobWorker;
 
 @WebListener
 public class ApplicationListener implements ServletContextListener {
@@ -32,6 +39,7 @@ public class ApplicationListener implements ServletContextListener {
 	private Logger log;
 	private AbsGlobal g;
 	private ServletContextEvent context;
+	private StdSchedulerFactory schedulerFactory;
 
 	public ApplicationListener() {
 		super();
@@ -49,16 +57,18 @@ public class ApplicationListener implements ServletContextListener {
 		this.context = context;
 		log.debug("ApplicationListener Initialized!");
 		if (Define.CONFIG_PATH == null) {
-			String webinf = new File(String.format("%s/WEB-INF/",context.getServletContext().getRealPath("/"))).getAbsolutePath();
-			Define.CONFIG_PATH = String.format("%s/config/",webinf);
-			log.debug("Set Define.CONFIG_PATH = {}",Define.CONFIG_PATH);
+			String webinf = new File(String.format("%s/WEB-INF/", context.getServletContext().getRealPath("/")))
+					.getAbsolutePath();
+			Define.CONFIG_PATH = String.format("%s/config/", webinf);
+			log.debug("Set Define.CONFIG_PATH = {}", Define.CONFIG_PATH);
 		}
 		if (Define.VIEW_PATH == null) {
-			String webinf = new File(String.format("%s/WEB-INF/",context.getServletContext().getRealPath("/"))).getAbsolutePath();
-			Define.VIEW_PATH = String.format("%s/view/",webinf);
-			log.debug("Set Define.VIEW_PATH = {}",Define.VIEW_PATH);
+			String webinf = new File(String.format("%s/WEB-INF/", context.getServletContext().getRealPath("/")))
+					.getAbsolutePath();
+			Define.VIEW_PATH = String.format("%s/view/", webinf);
+			log.debug("Set Define.VIEW_PATH = {}", Define.VIEW_PATH);
 		}
-		File logPropFile = new File(String.format("%s/log4j.properties",Define.CONFIG_PATH));
+		File logPropFile = new File(String.format("%s/log4j.properties", Define.CONFIG_PATH));
 		if (logPropFile.exists()) {
 			log.debug("Use /config/log4j.properties");
 			try {
@@ -104,7 +114,9 @@ public class ApplicationListener implements ServletContextListener {
 		}
 		Object o = Support.env().get("jobs");
 		DefaultScheduleWorker scheduleWorker = null;
+		Scheduler scheduler = null;
 		try {
+			scheduler = StdSchedulerFactory.getDefaultScheduler();
 			log.debug("Starting Jobs");
 			if (o instanceof List) {
 				scheduleWorker = Support.job().defaultSchedule(g);
@@ -113,31 +125,33 @@ public class ApplicationListener implements ServletContextListener {
 						.newInstance(g);
 			}
 			List<JobObject> jobs = scheduleWorker.getScheduleJobs();
-			for (JobObject jobWorker : jobs) {
-				String jobName = jobWorker.getJobName();
-				String jobClass = jobWorker.getClassify();
-				String cronExpression = jobWorker.getCronExpression();
-				log.debug("Starting: {}",jobName);
-				log.debug("Class: {}",jobClass);
-				log.debug("Cron Expression: {}",cronExpression);
-				org.quartz.Job job = (org.quartz.Job) Class.forName(jobClass).newInstance();
-				JobDetail jobDetail = JobBuilder.newJob(job.getClass()).withIdentity(jobName, jobWorker.getJobGroup())
-						.build();
-				jobDetail.getJobDataMap().put("AbsGlobal", g);
-				Trigger trigger = TriggerBuilder.newTrigger()
-						.withIdentity(jobWorker.getTriggerName(), jobWorker.getTriggerGroup())
-						.withSchedule(CronScheduleBuilder.cronSchedule(jobWorker.getCronExpression())).build();
-
-				JobListener jobListener = scheduleWorker.getJobListener();
-				TriggerListener triggerListener = scheduleWorker.getTriggerListener();
-				if(jobListener != null){
-					JobWorker.GLOBAL_SCHEDULER.getListenerManager().addJobListener(scheduleWorker.getJobListener());
+			if (jobs != null) {
+				scheduler.start();
+				for (JobObject jobObject : jobs) {
+					String jobName = jobObject.getJobName();
+					String jobClass = jobObject.getClassify();
+					String cronExpression = jobObject.getCronExpression();
+					log.debug("Starting: {}", jobName);
+					log.debug("Class: {}", jobClass);
+					log.debug("Cron Expression: {}", cronExpression);
+					org.quartz.Job job = (org.quartz.Job) Class.forName(jobClass).newInstance();
+					JobDetail jobDetail = JobBuilder.newJob(job.getClass())
+							.withIdentity(jobName, jobObject.getJobGroup()).build();
+					jobDetail.getJobDataMap().put("AbsGlobal", g);
+					Trigger trigger = TriggerBuilder.newTrigger()
+							.withIdentity(jobObject.getTriggerName(), jobObject.getTriggerGroup())
+							.withSchedule(CronScheduleBuilder.cronSchedule(jobObject.getCronExpression())).build();
+					JobListener jobListener = scheduleWorker.getJobListener();
+					TriggerListener triggerListener = scheduleWorker.getTriggerListener();
+					if (jobListener != null) {
+						scheduler.getListenerManager().addJobListener(scheduleWorker.getJobListener());
+					}
+					if (triggerListener != null) {
+						scheduler.getListenerManager()
+								.addTriggerListener(scheduleWorker.getTriggerListener());
+					}
+					scheduler.scheduleJob(jobDetail, trigger);
 				}
-				if(triggerListener != null){
-					JobWorker.GLOBAL_SCHEDULER.getListenerManager().addTriggerListener(scheduleWorker.getTriggerListener());
-				}
-				JobWorker.GLOBAL_SCHEDULER.start();
-				JobWorker.GLOBAL_SCHEDULER.scheduleJob(jobDetail, trigger);
 			}
 			log.debug("Started Jobs");
 		} catch (Exception e) {
@@ -150,10 +164,23 @@ public class ApplicationListener implements ServletContextListener {
 			return;
 		}
 		try {
-			if(JobWorker.GLOBAL_SCHEDULER != null){
-				JobWorker.GLOBAL_SCHEDULER.shutdown(true);
+			Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
+			if (scheduler != null) {
+				List<String> triggerGroupNames = scheduler.getTriggerGroupNames();
+				for (String groupName : triggerGroupNames) {
+					log.debug("unscheduleJob: {}",groupName);
+					Set<TriggerKey> triggerKeys = scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(groupName));
+					scheduler.unscheduleJobs(new ArrayList<TriggerKey>(triggerKeys));
+				}
+				List<String> jobGroupNames = scheduler.getTriggerGroupNames();
+				for (Iterator<String> iterator = jobGroupNames.iterator(); iterator.hasNext();) {
+					String groupName = iterator.next();
+					Set<JobKey> jobKeys = scheduler.getJobKeys(GroupMatcher.jobGroupEquals(groupName));
+					scheduler.deleteJobs(new ArrayList<JobKey>(jobKeys));
+				}
+				scheduler.shutdown(true);
 			}
-			log.debug("Scheduler Shutdown Status: {}",JobWorker.GLOBAL_SCHEDULER.isShutdown());
+			log.debug("Scheduler Shutdown Status: {}", scheduler.isShutdown());
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
