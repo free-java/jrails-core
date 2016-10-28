@@ -175,7 +175,7 @@ public class Tpl implements ReferenceInsertionEventHandler,NullSetEventHandler, 
 						Map<String,Object> attrs = (Map<String, Object>) attrCnfs.get("attributes");
 						if(attrs == null){
 							attrs = new HashMap<String,Object>();
-							log.debug("{}.yml require \"attribute\"",model);
+							log.debug("{}.yml require a key 'attribute'",model);
 						}
 						List<String> attrsKey = Support.map(attrs).keys();
 						Map<String,Object> attrCnf = null;
@@ -212,7 +212,7 @@ public class Tpl implements ReferenceInsertionEventHandler,NullSetEventHandler, 
 					break;
 				default:
 					value = g.t(res);
-					log.debug(reference + " = " + value);
+					log.debug("{} = {}",reference,value);
 					break;
 			}
 			if(value instanceof Map){
@@ -220,17 +220,17 @@ public class Tpl implements ReferenceInsertionEventHandler,NullSetEventHandler, 
 			}else if(value instanceof List){
 				value = Json.format(value);
 			}
-			log.debug("referenceInsert : " + reference + " = " + value);
+			log.debug("referenceInsert: {} = {}",reference,value);
 			return value == null ? "" : value;
 		}else {			
-			log.debug("referenceInsert : " + reference + " = " + value);
+			log.debug("referenceInsert: {} = {}",reference,value);
 			return value;
 		}			
 	}
 
 	@Override
 	public boolean shouldLogOnNullSet(String lhs, String rhs) {
-		log.debug("shouldLogOnNullSet : Set(" + lhs + " = " + rhs + " )");
+		log.debug("shouldLogOnNullSet: Set({} = {})",lhs,rhs);
 		return false;
 	}
 
@@ -238,7 +238,7 @@ public class Tpl implements ReferenceInsertionEventHandler,NullSetEventHandler, 
 	@Override
 	public Object methodException(Class claz, String method, Exception e)
 			throws Exception {
-		log.debug("methodException for : " + claz.getName() + "." + method);
+		log.debug("methodException for: {}.{}",claz.getName(),method);
 		log.debug(e.getMessage(),e);
 		return null;
 	}

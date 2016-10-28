@@ -39,7 +39,6 @@ public class ApplicationListener implements ServletContextListener {
 	private Logger log;
 	private AbsGlobal g;
 	private ServletContextEvent context;
-	private StdSchedulerFactory schedulerFactory;
 
 	public ApplicationListener() {
 		super();
@@ -70,7 +69,7 @@ public class ApplicationListener implements ServletContextListener {
 		}
 		File logPropFile = new File(String.format("%s/log4j.properties", Define.CONFIG_PATH));
 		if (logPropFile.exists()) {
-			log.debug("Use /config/log4j.properties");
+			log.debug("Use {}",logPropFile.getAbsolutePath());
 			try {
 				PropertyConfigurator.configure(logPropFile.toURI().toURL());
 			} catch (MalformedURLException e) {

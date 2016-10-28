@@ -527,7 +527,7 @@ public abstract class ActiveRecord extends IndexMap<String, Object> {
 			}
 		
 			if (updated) {
-				log.debug("Update Atts : " + updateValues);			
+				log.debug("Update Atts : {}",updateValues);			
 				updateValues.remove("created_user_id");
 				updateValues.remove("deleted_user_id");
 				updateValues.remove("created_at");
@@ -692,7 +692,7 @@ public abstract class ActiveRecord extends IndexMap<String, Object> {
 	 * @throws SQLException
 	 */
 	public <T extends ActiveRecord> T belongsTo(T t) throws SQLException {
-		log.debug("belongsTo : " + t.getClass().getSimpleName());
+		log.debug("belongsTo : {}",t.getClass().getSimpleName());
 		HasWorker has = Sql.has();
 		Query q = has.belongsTo(this,t.getClass().getSimpleName());
 		return q.first();
@@ -705,7 +705,7 @@ public abstract class ActiveRecord extends IndexMap<String, Object> {
 	 * @throws SQLException
 	 */
 	public <T extends ActiveRecord> T belongsTo(String belongName) throws SQLException {
-		log.debug("belongsTo : " + belongName);
+		log.debug("belongsTo : {}",belongName);
 		HasWorker has = Sql.has();
 		Query q = has.belongsTo(this,belongName);
 		return q.first();
@@ -719,7 +719,7 @@ public abstract class ActiveRecord extends IndexMap<String, Object> {
 	 * @throws SQLException
 	 */
 	public <T extends ActiveRecord> T hasOne(T t) throws SQLException {
-		log.debug("hasOne : " + t.getClass().getSimpleName());
+		log.debug("hasOne : {}",t.getClass().getSimpleName());
 		HasWorker has = Sql.has();
 		Query q = has.hasOne(this, t.getClass().getSimpleName());
 		return q.first();
@@ -732,7 +732,7 @@ public abstract class ActiveRecord extends IndexMap<String, Object> {
 	 * @throws SQLException
 	 */
 	public <T extends ActiveRecord> T hasOne(String hasName) throws SQLException {
-		log.debug("hasOne : " + hasName);
+		log.debug("hasOne : {}",hasName);
 		HasWorker has = Sql.has();
 		Query q = has.hasOne(this,hasName);
 		return q.first();
@@ -745,7 +745,7 @@ public abstract class ActiveRecord extends IndexMap<String, Object> {
 	 * @throws SQLException
 	 */
 	public <T extends ActiveRecord> List<T> hasMany(T t) throws SQLException {
-		log.debug("hasMany : " + t.getClass().getSimpleName());
+		log.debug("hasMany : {}",t.getClass().getSimpleName());
 		HasWorker has = Sql.has();
 		Query q = has.hasMany(this, t.getClass().getSimpleName());
 		return q.find();
@@ -758,7 +758,7 @@ public abstract class ActiveRecord extends IndexMap<String, Object> {
 	 * @throws SQLException
 	 */
 	public <T extends ActiveRecord> List<T> hasMany(String hasName) throws SQLException {
-		log.debug("hasName : " + hasName);
+		log.debug("hasName : {}",hasName);
 		HasWorker has = Sql.has();
 		Query q = has.hasMany(this,hasName);
 		return q.find();

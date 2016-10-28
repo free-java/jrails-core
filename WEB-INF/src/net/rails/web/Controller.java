@@ -119,16 +119,16 @@ public abstract class Controller {
 			parseParams(request.getParameterMap());
 		}
 		
-		if (log.isDebugEnabled()) {
-			log.debug("Headers : " + headers);
-			log.debug("UserAgent : " + headers.get("user-agent"));
-			log.debug("Cookies : " + cookies);
-			log.debug("Controller : " + route.getController());
-			log.debug("Action : " + route.getAction());
-			log.debug("Method : " + request.getMethod());
-			log.debug("Ajax : " +  ajax);
-			log.debug("Params : " + params);
-			log.debug("Queies : " + queies);
+		if (log.isDebugEnabled() || log.isInfoEnabled()) {
+			log.debug("Headers : {}",headers);
+			log.debug("UserAgent : {}",headers.get("user-agent"));
+			log.debug("Cookies : {}",cookies);
+			log.debug("Controller : {}",route.getController());
+			log.info("Action : {}",route.getAction());
+			log.debug("Method : {}",request.getMethod());
+			log.debug("Ajax : {}",ajax);
+			log.info("Params : {}",params);
+			log.info("Queies : {}",queies);
 		}
 	}
 
@@ -273,6 +273,7 @@ public abstract class Controller {
 				disp = "attachment; filename=*\"" + filename + "\"";
 			}
 			response.addHeader("Content-Disposition", disp);
+			response.addHeader("Transfer-Encoding", "chunked");
 			response.setContentType("application/x-msdownload");
 			BufferedOutputStream bos = null;
 			bos = new BufferedOutputStream(response.getOutputStream());
@@ -617,7 +618,7 @@ public abstract class Controller {
 
 	public void sendError(int code) throws IOException {
 		if (route.isActive()) {
-			log.debug("SendError : " + code);
+			log.debug("SendError : {}",code);
 			route.setActive(false);
 			response.sendError(code);
 			return;
@@ -626,7 +627,7 @@ public abstract class Controller {
 
 	public void sendError(int code, String text) throws IOException {
 		if (route.isActive()) {
-			log.debug("SendError : " + code + "," + text);
+			log.debug("SendError : {},{}",code,text);
 			route.setActive(false);
 			response.sendError(code, text);
 			return;

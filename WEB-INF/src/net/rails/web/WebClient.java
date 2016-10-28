@@ -188,11 +188,6 @@ public class WebClient {
 		}
 	}
 
-	/**
-	 * Get response text.
-	 * @return
-	 * @throws Exception
-	 */
 	public String getResponseText() throws Exception {
 		byte[] data = getResponseBytes();
 		if (data != null)
@@ -201,11 +196,6 @@ public class WebClient {
 			return null;
 	}
 	
-	/**
-	 * 获取请求失败后返回的文本内容。
-	 * @return
-	 * @throws Exception
-	 */
 	public String getErrorText() throws Exception {
 		byte[] data = getErrorBytes();
 		if (data != null)

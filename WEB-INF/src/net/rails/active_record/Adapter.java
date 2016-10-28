@@ -125,9 +125,9 @@ public class Adapter {
 		}
 		List<Map<String, Object>> list = null;
 		if(Cache.included(cacheName)){
-			if(log.isDebugEnabled()){
-				log.debug("Find sql for (Cache) : " + sql.getSql());
-				log.debug("Params for (Cache) : " + sql.getParams());
+			if(log.isInfoEnabled()){
+				log.info("Find SQL By Cache: {}",sql.getSql());
+				log.info("SQL Params: {}",sql.getParams());
 			}
 			list = (List<Map<String, Object>>) Cache.get(cacheName);
 			if(list == null){
@@ -135,9 +135,9 @@ public class Adapter {
 				Cache.set(cacheName,list,sql.getCacheSecond());				
 				return list;
 			}else{
-				if(log.isDebugEnabled()){
-					log.debug("Rows : " + list.size());
-					log.debug("Result(Cache) : " + list);
+				if(log.isDebugEnabled() || log.isInfoEnabled()){
+					log.info("Records: {}",list.size());
+					log.debug("Results: {}",list);
 				}
 				return list;
 			}
@@ -162,9 +162,9 @@ public class Adapter {
 		Connection connection = null;		
 		List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
 		try{
-			if(log.isDebugEnabled()){
-				log.debug("Find sql for : " + sql.getSql());
-				log.debug("Params for : " + sql.getParams());	
+			if(log.isInfoEnabled()){
+				log.info("Find SQL By DB: {}",sql.getSql());
+				log.info("SQL Params: {}",sql.getParams());	
 			}
 		    connection = openQueryConnection();
 			statement = connection.prepareStatement(sql.getSql());
@@ -182,9 +182,9 @@ public class Adapter {
 				}
 				rows.add(row);
 			}
-			if(log.isDebugEnabled()){
-				log.debug("Rows : " + rows.size());
-				log.debug("Result(DB) : " + rows);
+			if(log.isDebugEnabled() || log.isInfoEnabled()){
+				log.info("Records: {}",rows.size());
+				log.debug("Results: {}",rows);
 			}
 			return rows;
 		}finally{
@@ -199,9 +199,9 @@ public class Adapter {
 		try{
 			CreateWorker cw = Sql.create(record);
 			SqlWorker sql = Sql.sql(cw.getSql(),cw.params());
-			if(log.isDebugEnabled()){
-				log.debug("Execute sql for : " + sql.getSql());
-				log.debug("Params for : " + sql.getParams());
+			if(log.isInfoEnabled()){
+				log.info("Execute SQL: {}",sql.getSql());
+				log.info("SQL Params: {}",sql.getParams());
 			}		
 			connection = open();
 			statement = connection.prepareStatement(sql.getSql(),new String[] {record.getWriterAdapter().getPrimaryKey()});
@@ -237,9 +237,9 @@ public class Adapter {
 					statement = connection.prepareStatement(sql.getSql(),new String[] {record.getWriterAdapter().getPrimaryKey()});
 					first = false;
 				}
-				if(log.isDebugEnabled()){
-					log.debug("Execute sql for : " + sql.getSql());
-					log.debug("Params for : " + sql.getParams());
+				if(log.isInfoEnabled()){
+					log.info("Execute SQL: {}",sql.getSql());
+					log.info("SQL Params: {}",sql.getParams());
 				}
 				bindValues(statement,sql.getParams());
 				statement.addBatch();
@@ -259,9 +259,9 @@ public class Adapter {
 	public int execute(SqlWorker sql) throws SQLException{
 		PreparedStatement statement = null;
 		Connection connection = null;
-		if(log.isDebugEnabled()){
-			log.debug("Execute sql for : " + sql.getSql());
-			log.debug("Params for : " + sql.getParams());
+		if(log.isInfoEnabled()){
+			log.info("Execute SQL: {}",sql.getSql());
+			log.info("SQL Params: {}",sql.getParams());
 		}		
 		try{
 			connection = open();
@@ -282,9 +282,7 @@ public class Adapter {
 		if(COLUMN_NAMES.containsKey(model)){
 			return new ArrayList<String>(COLUMN_NAMES.get(model));
 		}
-		if(log.isDebugEnabled()){
-			log.debug("Get Column names for " + model);	
-		}
+		log.debug("Get Column names for {}", model);	
 		try{
 			connection = openQueryConnection();
 			statement = connection.prepareStatement("SELECT * FROM " + quoteSchemaAndTableName() + " WHERE 1 = 0");
@@ -312,9 +310,7 @@ public class Adapter {
 		if(COLUMN_CLASSES.containsKey(model))
 			return new HashMap<String,String>(COLUMN_CLASSES.get(model));
 		
-		if(log.isDebugEnabled()){
-			log.debug("Get column classes for " + model);
-		}
+		log.debug("Get column classes for {}",model);
 		final Map<String,String> types = new HashMap<String,String>();
 		try{
 			connection = openQueryConnection();
@@ -342,9 +338,7 @@ public class Adapter {
 		if(COLUMN_TYPES.containsKey(model))
 			return new HashMap<String,String>(COLUMN_TYPES.get(model));
 		
-		if(log.isDebugEnabled()){
-			log.debug("Get column types for " + model);
-		}
+		log.debug("Get column types for {}",model);
 		final Map<String,String> types = new HashMap<String,String>();
 		try{
 			connection = openQueryConnection();
@@ -514,7 +508,7 @@ public class Adapter {
 		Connection connection = CONNECTIONS.get(threadId);
 		try{
 			if (connection != null){
-				log.debug("Rollback Connection");
+				log.info("Rollback Connection");
 				connection.rollback();
 			}
 		}catch(SQLException e){
@@ -528,7 +522,7 @@ public class Adapter {
 		Connection connection = CONNECTIONS.get(threadId);
 		try{
 			if (connection != null){
-				log.debug("Commit Connection");
+				log.info("Commit Connection");
 				connection.commit();
 			}
 		}catch(SQLException e){
