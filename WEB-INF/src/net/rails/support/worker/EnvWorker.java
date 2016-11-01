@@ -91,11 +91,16 @@ public final class EnvWorker {
 		return t;
 	}
 	
-	public Object gets(String keys){
+	public <V> V gets(String keys,V def){
+		V v = Support.map(getRoot()).gets(keys);
+		return v == null ? def : v;
+	}
+	
+	public <V> V gets(String keys){
 		return Support.map(getRoot()).gets(keys);
 	}
 	
-	public Object gets(String...keyarr){
+	public <V> V gets(String...keyarr){
 		return Support.map(getRoot()).gets(keyarr);
 	}
 	

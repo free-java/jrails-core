@@ -22,8 +22,11 @@ import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
 import org.quartz.TriggerListener;
+import org.quartz.impl.DirectSchedulerFactory;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.matchers.GroupMatcher;
+import org.quartz.simpl.RAMJobStore;
+import org.quartz.simpl.SimpleThreadPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,12 +114,12 @@ public class ApplicationListener implements ServletContextListener {
 		if (!Support.env().getRoot().containsKey("jobs")) {
 			return;
 		}
+		final String SYSTEM_SCHEDULER = "SYSTEM_SCHEDULER";
+		DirectSchedulerFactory factory = DirectSchedulerFactory.getInstance();
+		Scheduler scheduler = null;
 		Object o = Support.env().get("jobs");
 		DefaultScheduleWorker scheduleWorker = null;
-		Scheduler scheduler = null;
 		try {
-			scheduler = StdSchedulerFactory.getDefaultScheduler();
-			log.debug("Starting Jobs");
 			if (o instanceof List) {
 				scheduleWorker = Support.job().defaultSchedule(g);
 			} else {
@@ -124,7 +127,15 @@ public class ApplicationListener implements ServletContextListener {
 						.newInstance(g);
 			}
 			List<JobObject> jobs = scheduleWorker.getScheduleJobs();
+			log.debug("Starting Jobs");
 			if (jobs != null) {
+				SimpleThreadPool threadPool = new SimpleThreadPool();
+				threadPool.setThreadCount(Support.env().gets("quartz.thread_count",10));
+				threadPool.setThreadPriority(Thread.NORM_PRIORITY);
+				threadPool.setThreadNamePrefix(SYSTEM_SCHEDULER);
+				threadPool.initialize();
+				factory.createScheduler(SYSTEM_SCHEDULER,SYSTEM_SCHEDULER,threadPool,new RAMJobStore());
+				scheduler = factory.getScheduler(SYSTEM_SCHEDULER);
 				scheduler.start();
 				for (JobObject jobObject : jobs) {
 					String jobName = jobObject.getJobName();
