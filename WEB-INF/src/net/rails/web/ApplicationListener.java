@@ -172,11 +172,20 @@ public class ApplicationListener implements ServletContextListener {
 
 	private void shutdownScheduler() {
 		DirectSchedulerFactory factory = DirectSchedulerFactory.getInstance();
+		Scheduler sysScheduler = null;
 		try {
 			Collection<Scheduler> schedulers = factory.getAllSchedulers();
+			log.info("Shutdown Scheduler Total: {}",schedulers.size());
 			for (Iterator<Scheduler> iterator = schedulers.iterator(); iterator.hasNext();) {
 				Scheduler scheduler = iterator.next();
-				shutdownScheduler(scheduler);
+				if(scheduler.getSchedulerName().equals(Define.SYSTEM_SCHEDULER)){
+					sysScheduler = scheduler;
+				}else{
+					shutdownScheduler(scheduler);
+				}
+			}
+			if(sysScheduler != null){
+				shutdownScheduler(sysScheduler);
 			}
 		} catch (SchedulerException e) {
 			log.error(e.getMessage(),e);
