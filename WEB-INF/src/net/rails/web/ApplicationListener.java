@@ -51,7 +51,7 @@ public class ApplicationListener implements ServletContextListener {
 
 	@Override
 	public void contextDestroyed(ServletContextEvent arg0) {
-		log.debug("ApplicationListener Destroyed!");
+		log.info("ApplicationListener Destroyed!");
 		shutdownScheduler();
 	}
 
@@ -128,7 +128,7 @@ public class ApplicationListener implements ServletContextListener {
 						.newInstance(g);
 			}
 			List<JobObject> jobs = scheduleWorker.getScheduleJobs();
-			log.debug("Starting Jobs");
+			log.info("Starting Jobs");
 			if (jobs != null) {
 				SimpleThreadPool threadPool = new SimpleThreadPool();
 				threadPool.setThreadCount(Support.env().gets("quartz.system_thread_count",10));
@@ -142,9 +142,9 @@ public class ApplicationListener implements ServletContextListener {
 					String jobName = jobObject.getJobName();
 					String jobClass = jobObject.getClassify();
 					String cronExpression = jobObject.getCronExpression();
-					log.debug("Starting: {}", jobName);
-					log.debug("Class: {}", jobClass);
-					log.debug("Cron Expression: {}", cronExpression);
+					log.info("Starting: {}", jobName);
+					log.info("Class: {}", jobClass);
+					log.info("Cron Expression: {}", cronExpression);
 					org.quartz.Job job = (org.quartz.Job) Class.forName(jobClass).newInstance();
 					JobDetail jobDetail = JobBuilder.newJob(job.getClass())
 							.withIdentity(jobName, jobObject.getJobGroup()).build();
@@ -164,7 +164,7 @@ public class ApplicationListener implements ServletContextListener {
 					scheduler.scheduleJob(jobDetail, trigger);
 				}
 			}
-			log.debug("Started Jobs");
+			log.info("Started Jobs");
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
@@ -189,19 +189,20 @@ public class ApplicationListener implements ServletContextListener {
 			if (scheduler != null) {
 				List<String> triggerGroupNames = scheduler.getTriggerGroupNames();
 				for (String groupName : triggerGroupNames) {
-					log.debug("unscheduleJob: {}",groupName);
+					log.info("UnscheduleJobs: {}",groupName);
 					Set<TriggerKey> triggerKeys = scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(groupName));
 					scheduler.unscheduleJobs(new ArrayList<TriggerKey>(triggerKeys));
 				}
 				List<String> jobGroupNames = scheduler.getTriggerGroupNames();
 				for (Iterator<String> iterator = jobGroupNames.iterator(); iterator.hasNext();) {
 					String groupName = iterator.next();
+					log.info("DeleteJobs: {}",groupName);
 					Set<JobKey> jobKeys = scheduler.getJobKeys(GroupMatcher.jobGroupEquals(groupName));
 					scheduler.deleteJobs(new ArrayList<JobKey>(jobKeys));
 				}
-				scheduler.shutdown(true);
+				scheduler.shutdown();
 			}
-			log.debug("Scheduler Shutdown Status: {} {}",scheduler.getSchedulerName(), scheduler.isShutdown());
+			log.info("Scheduler Shutdown Status: {} {}",scheduler.getSchedulerName(), scheduler.isShutdown());
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
