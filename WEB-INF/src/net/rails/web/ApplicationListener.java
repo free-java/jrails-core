@@ -3,6 +3,7 @@ package net.rails.web;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -18,12 +19,12 @@ import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.JobListener;
 import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
 import org.quartz.TriggerListener;
 import org.quartz.impl.DirectSchedulerFactory;
-import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.simpl.RAMJobStore;
 import org.quartz.simpl.SimpleThreadPool;
@@ -114,7 +115,7 @@ public class ApplicationListener implements ServletContextListener {
 		if (!Support.env().getRoot().containsKey("jobs")) {
 			return;
 		}
-		final String SYSTEM_SCHEDULER = "SYSTEM_SCHEDULER";
+		
 		DirectSchedulerFactory factory = DirectSchedulerFactory.getInstance();
 		Scheduler scheduler = null;
 		Object o = Support.env().get("jobs");
@@ -130,12 +131,12 @@ public class ApplicationListener implements ServletContextListener {
 			log.debug("Starting Jobs");
 			if (jobs != null) {
 				SimpleThreadPool threadPool = new SimpleThreadPool();
-				threadPool.setThreadCount(Support.env().gets("quartz.thread_count",10));
+				threadPool.setThreadCount(Support.env().gets("quartz.system_thread_count",10));
 				threadPool.setThreadPriority(Thread.NORM_PRIORITY);
-				threadPool.setThreadNamePrefix(SYSTEM_SCHEDULER);
+				threadPool.setThreadNamePrefix(Define.SYSTEM_SCHEDULER);
 				threadPool.initialize();
-				factory.createScheduler(SYSTEM_SCHEDULER,SYSTEM_SCHEDULER,threadPool,new RAMJobStore());
-				scheduler = factory.getScheduler(SYSTEM_SCHEDULER);
+				factory.createScheduler(Define.SYSTEM_SCHEDULER,Define.SYSTEM_SCHEDULER,threadPool,new RAMJobStore());
+				scheduler = factory.getScheduler(Define.SYSTEM_SCHEDULER);
 				scheduler.start();
 				for (JobObject jobObject : jobs) {
 					String jobName = jobObject.getJobName();
@@ -170,11 +171,21 @@ public class ApplicationListener implements ServletContextListener {
 	}
 
 	private void shutdownScheduler() {
-		if (!Support.env().getRoot().containsKey("jobs")) {
-			return;
-		}
+		DirectSchedulerFactory factory = DirectSchedulerFactory.getInstance();
 		try {
-			Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
+			Collection<Scheduler> schedulers = factory.getAllSchedulers();
+			for (Iterator<Scheduler> iterator = schedulers.iterator(); iterator.hasNext();) {
+				Scheduler scheduler = iterator.next();
+				shutdownScheduler(scheduler);
+			}
+		} catch (SchedulerException e) {
+			log.error(e.getMessage(),e);
+		}
+	}
+	
+	private void shutdownScheduler(Scheduler scheduler){
+		try {
+
 			if (scheduler != null) {
 				List<String> triggerGroupNames = scheduler.getTriggerGroupNames();
 				for (String groupName : triggerGroupNames) {
@@ -190,7 +201,7 @@ public class ApplicationListener implements ServletContextListener {
 				}
 				scheduler.shutdown(true);
 			}
-			log.debug("Scheduler Shutdown Status: {}", scheduler.isShutdown());
+			log.debug("Scheduler Shutdown Status: {} {}",scheduler.getSchedulerName(), scheduler.isShutdown());
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
