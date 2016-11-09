@@ -43,7 +43,7 @@ public final class LengthValidate extends Validate {
 		try {
 			parseValue = (String) attribute.parse(value);
 		} catch (Exception e) {
-			log.error(e.getMessage(),e);
+			log.warn(e.getMessage(),e);
 			typeError();
 			return null;
 		}

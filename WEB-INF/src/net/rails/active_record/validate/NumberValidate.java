@@ -54,7 +54,7 @@ public final class NumberValidate extends Validate {
 		try {
 			parseValue = (Number)attribute.parse(value);
 		} catch (Exception e) {
-			log.error(e.getMessage(),e);
+			log.warn(e.getMessage(),e);
 			typeError();
 			return null;
 		}

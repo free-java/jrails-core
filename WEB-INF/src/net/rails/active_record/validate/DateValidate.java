@@ -49,7 +49,7 @@ public final class DateValidate extends Validate {
 			parseValue = (Date)attribute.parse(value);
 			time = parseValue.getTime();
 		}catch (Exception e) {
-			log.error(e.getMessage(),e);
+			log.warn(e.getMessage(),e);
 			typeError();
 			return null;
 		}

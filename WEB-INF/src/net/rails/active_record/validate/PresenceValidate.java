@@ -21,7 +21,7 @@ public final class PresenceValidate extends Validate {
 		try {
 			parseValue = attribute.parse(value);
 		} catch (Exception e) {
-			log.error(e.getMessage(),e);
+			log.warn(e.getMessage(),e);
 			typeError();
 			return null;
 		}			

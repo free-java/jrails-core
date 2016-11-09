@@ -122,7 +122,7 @@ public abstract class ActiveRecord extends IndexMap<String, Object> {
 										.equals(on))) {
 							v.pass(get(attr));
 							if (v.getErrMsg() != null) {
-								log.error(v.getErrMsg());
+								log.warn(v.getErrMsg());
 								String msg = Support.string(v.getMessage()).def(v.getErrMsg());
 								list.add(msg);
 							}
@@ -131,7 +131,7 @@ public abstract class ActiveRecord extends IndexMap<String, Object> {
 				}
 				put(attr, a.parse(values.get(attr)));
 			} catch (TypeException e) {
-				log.error(e.getMessage(),e);
+				log.warn(e.getMessage(),e);
 				list.add(e.getShowMsg());
 			}
 		}

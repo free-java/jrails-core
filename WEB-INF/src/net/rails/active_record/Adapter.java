@@ -212,6 +212,7 @@ public class Adapter {
 				record.setId(rs.getObject(1));
 			}
 			rs.close();
+			log.info("Updated: {}",r);
 			return r > 0;
 		}catch(SQLException e){
 			throw e;

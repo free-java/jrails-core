@@ -21,7 +21,7 @@ public final class BooleanValidate extends Validate {
 		try {
 			parseValue = (Boolean)attribute.parse(value);
 		} catch (Exception e) {
-			log.error(e.getMessage(),e);
+			log.warn(e.getMessage(),e);
 			typeError();
 			return null;
 		}

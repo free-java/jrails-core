@@ -52,7 +52,7 @@ public final class TimestampValidate extends Validate {
 			parseValue = (Timestamp)attribute.parse(value);
 			time = parseValue.getTime();
 		} catch (Exception e) {
-			log.error(e.getMessage(),e);
+			log.warn(e.getMessage(),e);
 			typeError();
 			return null;
 		}

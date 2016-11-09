@@ -120,15 +120,15 @@ public abstract class Controller {
 		}
 		
 		if (log.isDebugEnabled() || log.isInfoEnabled()) {
-			log.debug("Headers : {}",headers);
-			log.debug("UserAgent : {}",headers.get("user-agent"));
-			log.debug("Cookies : {}",cookies);
-			log.debug("Controller : {}",route.getController());
-			log.info("Action : {}",route.getAction());
-			log.debug("Method : {}",request.getMethod());
-			log.debug("Ajax : {}",ajax);
-			log.info("Params : {}",params);
-			log.info("Queies : {}",queies);
+			log.debug("Headers: {}",headers);
+			log.debug("UserAgent: {}",headers.get("user-agent"));
+			log.debug("Cookies: {}",cookies);
+			log.info("Controller: {}",route.getController());
+			log.info("Action: {}",route.getAction());
+			log.debug("Method: {}",request.getMethod());
+			log.debug("Ajax: {}",ajax);
+			log.info("Request Params: {}",params);
+			log.debug("Request Queies: {}",queies);
 		}
 	}
 
@@ -618,7 +618,7 @@ public abstract class Controller {
 
 	public void sendError(int code) throws IOException {
 		if (route.isActive()) {
-			log.debug("SendError : {}",code);
+			log.debug("SendError: {}",code);
 			route.setActive(false);
 			response.sendError(code);
 			return;
@@ -627,7 +627,7 @@ public abstract class Controller {
 
 	public void sendError(int code, String text) throws IOException {
 		if (route.isActive()) {
-			log.debug("SendError : {},{}",code,text);
+			log.debug("SendError: {},{}",code,text);
 			route.setActive(false);
 			response.sendError(code, text);
 			return;

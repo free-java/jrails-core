@@ -53,7 +53,7 @@ public final class TimeValidate extends Validate {
 			parseValue = (Time)attribute.parse(value);
 			time = parseValue.getTime();
 		} catch (Exception e) {
-			log.error(e.getMessage(),e);
+			log.warn(e.getMessage(),e);
 			typeError();
 			return null;
 		}
