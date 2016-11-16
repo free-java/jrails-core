@@ -125,7 +125,7 @@ public class Tpl implements ReferenceInsertionEventHandler,NullSetEventHandler, 
 		ec.addEventHandler(this);
 		ec.attachToContext(context);
 		Velocity.evaluate(context, writer,text.getName(),text.getText().toString());
-		if(!log.isDebugEnabled() && compressed){
+		if(!(log.isDebugEnabled() || log.isInfoEnabled()) && compressed){
 			return compressor(writer.toString());			
 		}else{
 			return writer.toString();

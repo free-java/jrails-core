@@ -71,11 +71,20 @@ public class ApplicationListener implements ServletContextListener {
 			Define.VIEW_PATH = String.format("%s/view/", webinf);
 			log.debug("Set Define.VIEW_PATH = {}", Define.VIEW_PATH);
 		}
-		File logPropFile = new File(String.format("%s/log4j.properties", Define.CONFIG_PATH));
-		if (logPropFile.exists()) {
-			log.debug("Use {}",logPropFile.getAbsolutePath());
+		File logCnfFile = new File(String.format("%s/log4j.properties", Define.CONFIG_PATH));
+		if (logCnfFile.exists()) {
+			log.debug("Use {}",logCnfFile.getAbsolutePath());
 			try {
-				PropertyConfigurator.configure(logPropFile.toURI().toURL());
+				PropertyConfigurator.configure(logCnfFile.toURI().toURL());
+			} catch (MalformedURLException e) {
+				log.error(e.getMessage(), e);
+			}
+		}
+		logCnfFile = new File(String.format("%s/log4j.xml", Define.CONFIG_PATH));
+		if (logCnfFile.exists()) {
+			log.debug("Use {}",logCnfFile.getAbsolutePath());
+			try {
+				PropertyConfigurator.configure(logCnfFile.toURI().toURL());
 			} catch (MalformedURLException e) {
 				log.error(e.getMessage(), e);
 			}
