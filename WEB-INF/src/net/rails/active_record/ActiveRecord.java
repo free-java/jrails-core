@@ -572,7 +572,7 @@ public abstract class ActiveRecord extends IndexMap<String, Object> {
 	 * @param newValue
 	 * @param oldValue
 	 */
-	public Object saveTrigger(String attr,Object newValue,Object oldValue){
+	protected Object saveTrigger(String attr,Object newValue,Object oldValue){
 		return newValue;
 	}
 	
@@ -581,7 +581,7 @@ public abstract class ActiveRecord extends IndexMap<String, Object> {
 	 * @param newValue
 	 * @param oldValue
 	 */
-	public Object createTrigger(String attr,Object newValue){
+	protected Object createTrigger(String attr,Object newValue){
 		return newValue;
 	}
 	
@@ -590,38 +590,38 @@ public abstract class ActiveRecord extends IndexMap<String, Object> {
 	 * @param newValue
 	 * @param oldValue
 	 */
-	public Object updateTrigger(String attr,Object newValue,Object oldValue){
+	protected Object updateTrigger(String attr,Object newValue,Object oldValue){
 		return newValue;
 	}
 	
-	public boolean beforeCreate() {
+	protected boolean beforeCreate() {
 		return true;
 	}
 	
-	public boolean beforeUpdate(){
+	protected boolean beforeUpdate(){
 		return true;
 	}
 	
-	public boolean beforeDelete(){
+	protected boolean beforeDelete(){
 		return true;
 	}
 	
-	public boolean beforeDestroy(){
+	protected boolean beforeDestroy(){
 		return true;
 	}
 	
-	public void afterCreate(){
+	protected void afterCreate(){
 		
 	}
 	
-	public void afterUpdate(){
+	protected void afterUpdate(){
 		
 	}
-	public void afterDelete(){
+	protected void afterDelete(){
 		
 	}
 	
-	public void afterDestroy(){
+	protected void afterDestroy(){
 		
 	}
 
