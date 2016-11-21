@@ -137,7 +137,8 @@ public final class Attribute {
 					if (Support.object(o).blank())
 						return null;					
 					
-					String f = Support.string(format).def(record.getGlobal().t("formats","datetime"));
+					String defFormat = Support.map(record.getReaderAdapter().getDbcnf()).gets("formats","datetime");
+					String f = Support.string(format).def(defFormat);
 					return (T) new Timestamp(new SimpleDateFormat(f).parse(o.toString()).getTime());
 				}
 			} else if (type.equals("Date")) {
@@ -149,7 +150,8 @@ public final class Attribute {
 					if (Support.object(o).blank())
 						return null;
 					
-					String f = Support.string(format).def(record.getGlobal().t("formats","date"));
+					String defFormat = Support.map(record.getReaderAdapter().getDbcnf()).gets("formats","date");
+					String f = Support.string(format).def(defFormat);
 					return (T) new Date(new SimpleDateFormat(f).parse(o.toString()).getTime());
 				}
 			} else if (type.equals("Time")) {
@@ -159,7 +161,8 @@ public final class Attribute {
 					if (Support.object(o).blank())
 						return null;
 					
-					String f = Support.string(format).def(record.getGlobal().t("formats","time"));
+					String defFormat = Support.map(record.getReaderAdapter().getDbcnf()).gets("formats","time");
+					String f = Support.string(format).def(defFormat);
 					return (T) new Time(new SimpleDateFormat(f).parse(o.toString().trim()).getTime());
 				}
 			} else if (type.equals("Boolean")) {
