@@ -1474,7 +1474,7 @@ public class Query implements Cloneable {
 			}else {
 				return sv;
 			}
-		}		
+		}
 		return value;
 	}
 	

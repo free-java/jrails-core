@@ -92,11 +92,14 @@ public class SqlWorker implements Cloneable{
 		List<Object> list = null;
 		StringBuffer sbf = new StringBuffer();
 		if(arrs instanceof Object[]){
-			list = Arrays.asList((Object[])arrs);
+			list = new ArrayList(Arrays.asList((Object[])arrs));
 		}else{
-			list = (List<Object>) arrs;
+			list = new ArrayList((List<Object>) arrs);
 		}
 		list.remove(null);
+		if(list.size() == 0){
+			list.add("[SIZE_0]");
+		}
 		for(int i = 0;i < list.size();i++){
 			if(list.get(i) instanceof Number)
 				sbf.append(list.get(i));

@@ -3,6 +3,7 @@ package test;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.Map;
 
 import javax.xml.bind.DatatypeConverter;
@@ -12,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import app.model.Account;
+import net.rails.Define;
 import net.rails.active_record.Adapter;
 import net.rails.active_record.DBResource;
 import net.rails.ciphertext.Ciphertext;
@@ -52,11 +54,13 @@ public class DbTest
         	g.setLocale("default");
         	Logger log = LoggerFactory.getLogger(this.getClass());
         	log.debug("hi,{}",1234);
-//        	Query q = new Query(new Account(g));
-//        	q.and("ge_name","aa");
-//        	q.order("name", "ASC");
-//        	q.group("name");
-//        	System.out.println(q.first());
+        	Query q = new Query(new Account(g));
+        	q.skipnil(true);
+        	q.and("ni_name",null);
+        	q.and("eq_id",null);
+        	q.order("name", "ASC");
+        	q.group("name");
+        	System.out.println(q.first());
 //        	
 //        	Account a = new Account(g);
 //        	a.put("name", "test");

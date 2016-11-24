@@ -8,6 +8,8 @@ public class GlobalUnit extends AbsGlobal {
 	static{
 		Define.CONFIG_PATH = String.format("%s/WEB-INF/config",System.getProperty("user.dir"));
 		Define.VIEW_PATH = String.format("%s/WEB-INF/view",System.getProperty("user.dir"));
+		System.out.println(Define.CONFIG_PATH);
+		System.out.println(Define.VIEW_PATH);
 	}
 	
 	private Object userId;

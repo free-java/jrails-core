@@ -158,9 +158,9 @@ public class WhereWorker {
 				// Column and table split
 				String[] ct = m.replaceFirst("").split("_from_");
 				Object value = andsOrs.get(logic);
-				if (skipnil && Support.object(value).blank())
+				if (skipnil && Support.object(value).blank()){
 					continue;
-
+				}
 				String t = null;
 				String c = null;
 				String[] names = null;
@@ -197,9 +197,10 @@ public class WhereWorker {
 		} else if (oper.equals("in") || oper.equals("ni")) {
 			from(ftable);
 			where = MessageFormat.format(LOGICALS.get(oper), fada.quoteSchemaDot() + quote(ftable) + "." + quote(column), ":" + logic);
-			if (value instanceof List || value instanceof Object[])
+			
+			if (value instanceof List || value instanceof Object[]){
 				param = formater(logic,oper,ftable,column,value);
-			else {
+			}else {
 				List<Object> ls = new ArrayList<Object>();
 				ls.add(formater(logic,oper,ftable,column,value));
 				param = ls;
@@ -290,9 +291,9 @@ public class WhereWorker {
 	/*protected methods*/
 	
 	protected Object formater(String logic,String oper,String table,String column, Object value) {
-		if (value instanceof String)
+		if (value instanceof String){
 			return value.toString().trim();
-
+		}
 		return value;
 	}
 	
