@@ -24,6 +24,8 @@ public final class CodeWorker {
 	}
 	
 	public String id() {
+		return id(16);
+		/**
 		final Character[] CHARS = new Character[] { '0', '1',
 				'2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd',
 				'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p',
@@ -51,7 +53,20 @@ public final class CodeWorker {
 			sbf.append(CHARS[new Random().nextInt(36)]);
 			String id16 = sbf.toString();
 			return id16;
-
+		 **/
+	}
+	
+	public String id(int len) {
+		final Character[] CHARS = new Character[] { '0', '1',
+				'2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd',
+				'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p',
+				'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
+        StringBuffer id = new StringBuffer();
+        for(int i = 0;i < len;i ++){
+        	char c = CHARS[new Random().nextInt(CHARS.length)];
+        	id.append(c);
+        }
+        return id.toString();
 	}
 
 	public String md5(String text) {
