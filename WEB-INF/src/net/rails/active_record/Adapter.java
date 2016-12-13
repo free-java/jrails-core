@@ -268,7 +268,9 @@ public class Adapter {
 			connection = open();
 			statement = connection.prepareStatement(sql.getSql());
 			bindValues(statement,sql.getParams());
-			return statement.executeUpdate();
+			int r = statement.executeUpdate();
+			log.info("Updated: {}",r);
+			return r;
 		}catch(SQLException e){
 			throw e;
 		}finally{
