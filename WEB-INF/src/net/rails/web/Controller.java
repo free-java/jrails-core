@@ -254,51 +254,69 @@ public abstract class Controller {
 	public UserAgentWorker getUserAgent() {
 		return userAgent;
 	}
-
-	public void file(InputStream is, String filename) throws IOException {
+	
+	public void file(InputStream is, String filename,String contentType) throws IOException {
 		if (route.isActive()) {
 			route.setActive(false);
-			String charset = Support.config().env().getApplicationCharset();
-			filename = URLEncoder.encode(filename, charset);
-			filename = new String(filename.getBytes(charset), "ISO-8859-1");
-			TokenWorker token = userAgent.browser();
-			String disp = "attachment; filename*=\"" + filename + "\"";
-			if (token.getGroup() == null) {
-				disp = "attachment; filename*=\"" + filename + "\"";
-			} else if (token.getGroup().equals("MSIE")) {
-				disp = "attachment; filename=\"" + filename + "\"";
-			} else if (token.getGroup().equals("Chrome")) {
-				disp = "attachment; filename=\"" + filename + "\"";
-			} else {
-				disp = "attachment; filename=*\"" + filename + "\"";
-			}
-			response.addHeader("Content-Disposition", disp);
-			response.addHeader("Transfer-Encoding", "chunked");
-			response.setContentType("application/x-msdownload");
 			BufferedOutputStream bos = null;
-			bos = new BufferedOutputStream(response.getOutputStream());
-			byte[] buff = new byte[1024];
-			int bytesRead;
-			while (-1 != (bytesRead = is.read(buff, 0, buff.length))) {
-				bos.write(buff, 0, bytesRead);
+			try{
+				String charset = Support.config().env().getApplicationCharset();
+				filename = URLEncoder.encode(filename, charset);
+				filename = new String(filename.getBytes(charset), "ISO-8859-1");
+				TokenWorker token = userAgent.browser();
+				String disp = "attachment; filename*=\"" + filename + "\"";
+				if (token.getGroup() == null) {
+					disp = "attachment; filename*=\"" + filename + "\"";
+				} else if (token.getGroup().equals("MSIE")) {
+					disp = "attachment; filename=\"" + filename + "\"";
+				} else if (token.getGroup().equals("Chrome")) {
+					disp = "attachment; filename=\"" + filename + "\"";
+				} else {
+					disp = "attachment; filename=*\"" + filename + "\"";
+				}
+				response.addHeader("Content-Disposition", disp);
+				response.addHeader("Transfer-Encoding", "chunked");
+				response.setContentType(contentType);
+				
+				bos = new BufferedOutputStream(response.getOutputStream());
+				byte[] buff = new byte[1024];
+				int bytesRead;
+				while (-1 != (bytesRead = is.read(buff, 0, buff.length))) {
+					bos.write(buff, 0, bytesRead);
+				}
+			}finally{
+				is.close();
+				if(bos != null){
+					bos.close();
+				}
 			}
-			is.close();
-			bos.close();
 		}
+	}
+	
+	public void file(InputStream is, String filename) throws IOException {
+		file(is,filename,"application/x-msdownload");
 	}
 
 	public void file(byte[] data, String filename) throws IOException {
 		file(new ByteArrayInputStream(data), filename);
 	}
+	
+	public void file(byte[] data, String filename,String contentType) throws IOException {
+		file(new ByteArrayInputStream(data), filename,contentType);
+	}
 
 	public void file(File file, String filename) throws IOException {
 		file(FileUtils.readFileToByteArray(file), filename);
+	}
+	
+	public void file(File file, String filename,String contentType) throws IOException {
+		file(FileUtils.readFileToByteArray(file), filename,contentType);
 	}
 
 	public void file(File file) throws IOException {
 		file(file, file.getName());
 	}
-
+	
 	public void forwardRoute(String route) throws IOException, ServletException {
 		Route r = new Route(request, route);
 		forward(r.getController(), r.getAction());
