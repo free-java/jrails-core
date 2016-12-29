@@ -270,7 +270,7 @@ public class Json<K,V> extends IndexMap<K,V> {
 	}
 	
 	protected static String debugSequence() {
-		if(log.isDebugEnabled() || log.isInfoEnabled()){
+		if(!log.isErrorEnabled()){
 			return "\n";
 		}else{
 			return "";

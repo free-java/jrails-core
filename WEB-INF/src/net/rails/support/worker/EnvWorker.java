@@ -104,6 +104,10 @@ public final class EnvWorker {
 		return Support.map(getRoot()).gets(keyarr);
 	}
 	
+	public boolean isDebug() {
+		return !log.isErrorEnabled();
+	}
+	
 	private String getHostname() {
 		try {
 			InetAddress addr;
