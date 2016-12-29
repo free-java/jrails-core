@@ -51,6 +51,10 @@ public final class Support {
 		return new NumberWorker(pattern,source);
 	}
 	
+	public static CalendarWorker calendar() {
+		return new CalendarWorker();
+	}
+	
 	public static CalendarWorker calendar(long millis) {
 		return new CalendarWorker(millis);
 	}

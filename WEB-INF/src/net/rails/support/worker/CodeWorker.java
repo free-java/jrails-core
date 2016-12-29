@@ -1,7 +1,6 @@
 package net.rails.support.worker;
 
 import java.security.MessageDigest;
-import java.util.Calendar;
 import java.util.Random;
 import org.apache.velocity.tools.generic.EscapeTool;
 import org.slf4j.Logger;

@@ -3,10 +3,17 @@ package net.rails.support.worker;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 public final class CalendarWorker {
 
 	private Calendar source;
+	
+	public CalendarWorker() {
+		super();
+		source = Calendar.getInstance();
+		source.setTimeInMillis(new Date().getTime());
+	}
 	
 	public CalendarWorker(long millis) {
 		super();
@@ -23,11 +30,6 @@ public final class CalendarWorker {
 	public String format(String pattern){
 		SimpleDateFormat sdf = new SimpleDateFormat(pattern);
 		return sdf.format(source.getTime());
-	}
-	
-	public boolean check(String pattern,String text){
-		
-		return false;
 	}
 	
 	public Calendar getSource(){
