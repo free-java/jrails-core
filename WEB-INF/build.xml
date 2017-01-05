@@ -84,19 +84,19 @@
 	</target>
 	
 	<target name="release—lib" depends="package">
-	    <delete dir="/src/private-java/jrails-designer/WEB-INF/lib" />
-	    <delete dir="/src/free-core-lib/${jr.version}" />
-	    <mkdir dir="/src/private-java/jrails-designer/WEB-INF/lib" />
-	    <mkdir dir="/src/free-core-lib/${jr.version}" />
+	    <delete dir="/src/development/private-java/jrails-designer/WEB-INF/lib" />
+	    <delete dir="/src/development/free-core-lib/${jr.version}" />
+	    <mkdir dir="/src/development/private-java/jrails-designer/WEB-INF/lib" />
+	    <mkdir dir="/src/development/free-core-lib/${jr.version}" />
 	
-		<copy file="${jr.core.jar}" todir="/src/private-java/jrails-designer/WEB-INF/lib"/>
-		<copy file="${jr.core.jar}" todir="/src/free-core-lib/${jr.version}"/>
+		<copy file="${jr.core.jar}" todir="/src/development/private-java/jrails-designer/WEB-INF/lib"/>
+		<copy file="${jr.core.jar}" todir="/src/development/free-core-lib/${jr.version}"/>
 		
-		<copy todir="/src/private-java/jrails-designer/WEB-INF/lib"> 
+		<copy todir="/src/development/private-java/jrails-designer/WEB-INF/lib"> 
 		  <fileset dir="${jr.lib}"/>
         </copy>
         
-		<copy todir="/src/free-core-lib/${jr.version}"> 
+		<copy todir="/src/development/free-core-lib/${jr.version}"> 
 		  <fileset dir="${jr.lib}"/>
         </copy>
   
