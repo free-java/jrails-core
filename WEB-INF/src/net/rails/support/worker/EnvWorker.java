@@ -104,8 +104,8 @@ public final class EnvWorker {
 		return Support.map(getRoot()).gets(keyarr);
 	}
 	
-	public boolean isDebug() {
-		return !log.isErrorEnabled();
+	public boolean isError() {
+		return log.isErrorEnabled();
 	}
 	
 	private String getHostname() {
