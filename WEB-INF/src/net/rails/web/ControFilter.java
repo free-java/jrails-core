@@ -137,16 +137,15 @@ public final class ControFilter implements Filter {
 				}
 			} catch (Exception e) {
 				if(e instanceof ClassNotFoundException){
-					log.error("Controller (404): " + route.getController() + "/" + route.getAction(), e);
+					log.warn("Controller (404): {}/{}",route.getController() ,route.getAction(), e);
 					sendError(response,404);
 					route.setActive(false);
 				}else if(e instanceof PathException){
-					log.error(e.getMessage(), e);
+					log.warn(e.getMessage(), e);
 					sendError(response,404);
 					route.setActive(false);
 				}else {
-					log.error("Error (500)");
-					log.error(e.getMessage(),e);
+					log.warn(e.getMessage(),e);
 					sendError(response, 500);
 					route.setActive(false);
 				}

@@ -41,7 +41,7 @@ import net.rails.support.job.worker.JobObject;
 public class ApplicationListener implements ServletContextListener {
 
 	private Logger log;
-	private AbsGlobal g;
+//	private AbsGlobal g;
 	private ServletContextEvent context;
 
 	public ApplicationListener() {
@@ -89,7 +89,7 @@ public class ApplicationListener implements ServletContextListener {
 				log.error(e.getMessage(), e);
 			}
 		}
-		g = new AbsGlobal() {
+		final AbsGlobal g = new AbsGlobal() {
 
 			@Override
 			public void setUserId(Object userId) {
@@ -117,10 +117,10 @@ public class ApplicationListener implements ServletContextListener {
 			}
 
 		};
-		startJobs();
+		startJobs(g);
 	}
 
-	private void startJobs() {
+	private void startJobs(AbsGlobal g) {
 		if (!Support.env().getRoot().containsKey("jobs")) {
 			return;
 		}
