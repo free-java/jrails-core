@@ -26,7 +26,7 @@ public abstract class Validate {
 
 	protected Map<String, Object> attrCnf;
 	protected Map<String, Object> valiCnf;
-	protected Map<String, Object> locale;
+//	protected Map<String, Object> locale;
 
 	protected boolean allowBlank = false;
 	protected Logger log;
@@ -41,7 +41,7 @@ public abstract class Validate {
 		this.model = attribute.getModel();
 		this.name = attribute.getName();
 		this.attribute = attribute;
-		locale = (Map<String, Object>) g.locale();
+//		locale = (Map<String, Object>) g.locale();
 		init();
 	}
 
