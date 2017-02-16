@@ -130,5 +130,29 @@ public final class StringWorker {
 		Matcher m = p.matcher(source);
 		return m.matches();
 	}
+	
+	public String left(int len){
+		if(blank()){
+			return "";
+		}
+		int sourceLen = source.length();
+        if(source.length() <= len){
+			return source.substring(0,sourceLen);
+		}else{
+			return source.substring(0,len);
+		}
+	}
+	
+	public String right(int len){
+		if(blank()){
+			return "";
+		}
+		int sourceLen = source.length();
+        if(source.length() <= len){
+			return source;
+		}else{
+			return source.substring(sourceLen - len,sourceLen);
+		}
+	}
 
 }
