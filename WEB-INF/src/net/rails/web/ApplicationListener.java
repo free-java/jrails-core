@@ -1,11 +1,13 @@
 package net.rails.web;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.servlet.ServletContextEvent;
@@ -33,6 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import net.rails.Define;
 import net.rails.ext.AbsGlobal;
+import net.rails.log.LogPoint;
 import net.rails.support.Support;
 import net.rails.support.job.worker.DefaultScheduleWorker;
 import net.rails.support.job.worker.JobObject;
@@ -41,12 +44,12 @@ import net.rails.support.job.worker.JobObject;
 public class ApplicationListener implements ServletContextListener {
 
 	private Logger log;
-//	private AbsGlobal g;
 	private ServletContextEvent context;
 
 	public ApplicationListener() {
 		super();
 		log = LoggerFactory.getLogger(ApplicationListener.class);
+		LogPoint.markApp();
 	}
 
 	@Override
@@ -89,6 +92,18 @@ public class ApplicationListener implements ServletContextListener {
 				log.error(e.getMessage(), e);
 			}
 		}
+		
+		File filterPropFile = new File(String.format("%s/filter.properties", Define.CONFIG_PATH));
+		if(filterPropFile.exists()){
+			try{
+				Properties ps = new Properties();
+				ps.load(new FileInputStream(filterPropFile));
+				LogPoint.configure(ps);
+			}catch(Exception e){
+				log.error(e.getMessage(), e);
+			}
+		}
+
 		final AbsGlobal g = new AbsGlobal() {
 
 			@Override

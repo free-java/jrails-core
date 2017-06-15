@@ -23,6 +23,7 @@ import java.util.Map;
 
 import net.rails.cache.Cache;
 import net.rails.ext.IndexMap;
+import net.rails.log.LogPoint;
 import net.rails.sql.Sql;
 import net.rails.sql.worker.CreateWorker;
 import net.rails.sql.worker.SqlWorker;
@@ -116,6 +117,7 @@ public class Adapter {
 	}	
 	
 	public synchronized List<Map<String,Object>> syncFind(SqlWorker sql) throws SQLException{
+		LogPoint.markSqlCache();
 		String cacheName = sql.getCacheName();		
 		if(sql.getCacheName() == null){
 			cacheName = Support.code().md5(sql.getSql() + sql.getParams() + sql.getMaxRows());
@@ -125,25 +127,28 @@ public class Adapter {
 		}
 		List<Map<String, Object>> list = null;
 		if(Cache.included(cacheName)){
-			if(log.isInfoEnabled()){
-				log.info("Find SQL By Cache: {}",sql.getSql());
-				log.info("SQL Params: {}",sql.getParams());
-			}
+			log.info("Find SQL By Cache: {}",sql.getSql());
+			log.info("SQL Params: {}",sql.getParams());
 			list = (List<Map<String, Object>>) Cache.get(cacheName);
 			if(list == null){
 				list =  findSql(sql);
-				Cache.set(cacheName,list,sql.getCacheSecond());				
+				Cache.set(cacheName,list,sql.getCacheSecond());	
+				LogPoint.markSqlRows();
+				log.info("Records: {}",list.size());
+				LogPoint.markSqlResult();
+				log.debug("Results: {}",list);
+				LogPoint.unmark();
 				return list;
 			}else{
-				if(log.isDebugEnabled() || log.isInfoEnabled()){
-					log.info("Records: {}",list.size());
-					log.debug("Results: {}",list);
-				}
+				LogPoint.markSqlRows();
+				log.info("Records: {}",list.size());
+				LogPoint.markSqlResult();
+				log.debug("Results: {}",list);
+				LogPoint.unmark();
 				return list;
 			}
 		}else{
 			list = findSql(sql);
-			Cache.set(cacheName,list,sql.getCacheSecond());				
 			return list;
 		}
 	}
@@ -156,16 +161,15 @@ public class Adapter {
 	}
 	
 	private List<Map<String,Object>> findSql(SqlWorker sql) throws SQLException{
+		LogPoint.markSql();
 		Map<String, Object> row = null;
 		ResultSet result = null;
 		PreparedStatement statement = null;
 		Connection connection = null;		
 		List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
 		try{
-			if(log.isInfoEnabled()){
-				log.info("Find SQL By DB: {}",sql.getSql());
-				log.info("SQL Params: {}",sql.getParams());	
-			}
+			log.info("Find SQL By DB: {}",sql.getSql());
+			log.info("SQL Params: {}",sql.getParams());	
 		    connection = openQueryConnection();
 			statement = connection.prepareStatement(sql.getSql());
 			if(sql.getMaxRows() > 0){
@@ -182,27 +186,27 @@ public class Adapter {
 				}
 				rows.add(row);
 			}
-			if(log.isDebugEnabled() || log.isInfoEnabled()){
-				log.info("Records: {}",rows.size());
-				log.debug("Results: {}",rows);
-			}
-			return rows;
+			LogPoint.markSqlRows();
+			log.info("Records: {}",rows.size());
+			LogPoint.markSqlResult();
+			log.debug("Results: {}",rows);
+		    return rows;
 		}finally{
+			LogPoint.unmark();
 			closeQueryConnection(result,statement,connection);
 		}
 	}
 	
 	public boolean create(ActiveRecord record) throws SQLException{
+		LogPoint.markSql();
 		PreparedStatement statement = null;
 		Connection connection = null;
 		ResultSet rs = null;
 		try{
 			CreateWorker cw = Sql.create(record);
 			SqlWorker sql = Sql.sql(cw.getSql(),cw.params());
-			if(log.isInfoEnabled()){
-				log.info("Execute SQL: {}",sql.getSql());
-				log.info("SQL Params: {}",sql.getParams());
-			}		
+			log.info("Execute SQL: {}",sql.getSql());
+			log.info("SQL Params: {}",sql.getParams());
 			connection = open();
 			statement = connection.prepareStatement(sql.getSql(),new String[] {record.getWriterAdapter().getPrimaryKey()});
 			bindValues(statement,sql.getParams());
@@ -217,11 +221,13 @@ public class Adapter {
 		}catch(SQLException e){
 			throw e;
 		}finally{
+			LogPoint.unmark();
 			closeConnection(statement,connection);
 		}
 	}
 	
 	public <T extends ActiveRecord> int[] create(List<T> records) throws SQLException{
+		LogPoint.markSql();
 		boolean first = true;
 		PreparedStatement statement = null;
 		Connection connection = null;
@@ -238,10 +244,8 @@ public class Adapter {
 					statement = connection.prepareStatement(sql.getSql(),new String[] {record.getWriterAdapter().getPrimaryKey()});
 					first = false;
 				}
-				if(log.isInfoEnabled()){
-					log.info("Execute SQL: {}",sql.getSql());
-					log.info("SQL Params: {}",sql.getParams());
-				}
+				log.info("Execute SQL: {}",sql.getSql());
+				log.info("SQL Params: {}",sql.getParams());
 				bindValues(statement,sql.getParams());
 				statement.addBatch();
 			}
@@ -253,17 +257,17 @@ public class Adapter {
 		}catch(SQLException e){
 			throw e;
 		}finally{
+			LogPoint.unmark();
 			closeConnection(statement,connection);
 		}
 	}
 	
 	public int execute(SqlWorker sql) throws SQLException{
+		LogPoint.markSql();
 		PreparedStatement statement = null;
 		Connection connection = null;
-		if(log.isInfoEnabled()){
-			log.info("Execute SQL: {}",sql.getSql());
-			log.info("SQL Params: {}",sql.getParams());
-		}		
+		log.info("Execute SQL: {}",sql.getSql());
+		log.info("SQL Params: {}",sql.getParams());
 		try{
 			connection = open();
 			statement = connection.prepareStatement(sql.getSql());
@@ -274,6 +278,7 @@ public class Adapter {
 		}catch(SQLException e){
 			throw e;
 		}finally{
+			LogPoint.unmark();
 			closeConnection(statement,connection);
 		}
 	}
@@ -431,33 +436,39 @@ public class Adapter {
 	}
 	
 	private Connection open() throws SQLException{
+		LogPoint.markSqlConn();
 		Connection connection = null;
 		if(isAutoCommit()){
 			log.debug("Open Connection");
+			LogPoint.unmark();
 			connection = dataSource.getConnection();
 			connection.setAutoCommit(isAutoCommit());
 			return connection;
 		}else{
 			if(CONNECTIONS.containsKey(threadId)){
 				log.debug("Get Transaction Connection");
+				LogPoint.unmark();
 				return CONNECTIONS.get(threadId);
 			}else{
 				log.debug("Open Transaction Connection");
 				connection = dataSource.getConnection();
 				connection.setAutoCommit(isAutoCommit());
 				CONNECTIONS.put(threadId, connection);
+				LogPoint.unmark();
 				return CONNECTIONS.get(threadId);
 			}
 		}
 	}
 	
 	private Connection openQueryConnection() throws SQLException{		
+		LogPoint.markSqlConn();
 		log.debug("Open Qyery Connection");
+		LogPoint.unmark();
 		return dataSource.getConnection();
 	}
 	
 	private void closeQueryConnection(ResultSet result,PreparedStatement statement,Connection connection) {
-		
+		LogPoint.markSqlConn();
 		try{
 			if (result != null){
 				log.debug("Close Query Result");
@@ -473,10 +484,13 @@ public class Adapter {
 			}
 		}catch(SQLException e){
 			log.error(e.getMessage(),e);
+		}finally{
+			LogPoint.unmark();
 		}
 	}
 	
 	private void closeConnection(PreparedStatement statement,Connection connection) {
+		LogPoint.markSqlConn();
 		if(isAutoCommit()){
 			try{
 				if (statement != null){
@@ -491,9 +505,11 @@ public class Adapter {
 				log.error(e.getMessage(),e);
 			}
 		}
+		LogPoint.unmark();
 	}
 	
 	private void closeTransactionConnection() {
+		LogPoint.markSqlConn();
 		Connection connection = CONNECTIONS.get(threadId);
 		try{
 			if (connection != null){
@@ -503,11 +519,13 @@ public class Adapter {
 		}catch(SQLException e){
 			log.error(e.getMessage(),e);
 		}finally{
+			LogPoint.unmark();
 			CONNECTIONS.remove(threadId);
 		}
 	}
 	
 	public void rollback() {
+		LogPoint.markSqlConn();
 		Connection connection = CONNECTIONS.get(threadId);
 		try{
 			if (connection != null){
@@ -517,11 +535,13 @@ public class Adapter {
 		}catch(SQLException e){
 			log.error(e.getMessage(),e);
 		}finally{
+			LogPoint.unmark();
 			closeTransactionConnection();
 		}
 	}
 	
 	public void commit() {
+		LogPoint.markSqlConn();
 		Connection connection = CONNECTIONS.get(threadId);
 		try{
 			if (connection != null){
@@ -531,11 +551,13 @@ public class Adapter {
 		}catch(SQLException e){
 			log.error(e.getMessage(),e);
 		}finally{
+			LogPoint.unmark();
 			closeTransactionConnection();
 		}
 	}
 	
 	protected void initDataSource() {
+		LogPoint.markSqlConn();
 		try {
 			if(dbcnf.containsKey("jndi")){
 				Context cxt = new InitialContext();
@@ -554,6 +576,8 @@ public class Adapter {
 			}
 		}catch (Exception e) {
 			log.error(e.getMessage(),e);
+		}finally{
+			LogPoint.unmark();
 		}
 	}
 	

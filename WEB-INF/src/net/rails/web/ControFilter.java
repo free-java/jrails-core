@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.rails.ext.IndexMap;
+import net.rails.log.LogPoint;
 import net.rails.support.Support;
 
 @WebFilter(
@@ -46,6 +47,7 @@ public final class ControFilter implements Filter {
 	}
 	
 	private void logInfo(HttpServletRequest request){
+		LogPoint.markWeb();
 		if(log.isDebugEnabled()){
 			log.debug("Remote Addr: {}",request.getRemoteAddr());
 			String qs = request.getQueryString();
@@ -57,6 +59,7 @@ public final class ControFilter implements Filter {
 			}
 			log.debug("{}",url);
 		}
+		LogPoint.unmark();
 	}
 
 	@SuppressWarnings({ "unchecked"})

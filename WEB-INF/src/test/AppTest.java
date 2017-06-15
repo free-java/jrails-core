@@ -187,5 +187,11 @@ public class AppTest
 			MDC.clear();
 		}
 	}
+	
+	
+	public void testName(){
+		String s = Support.inflect("AA").pascalcase();
+		System.out.println(s);
+	}
     
 }

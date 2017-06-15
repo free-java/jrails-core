@@ -34,6 +34,7 @@ import net.rails.active_record.ActiveRecord;
 import net.rails.ext.AbsGlobal;
 import net.rails.ext.IndexMap;
 import net.rails.ext.Json;
+import net.rails.log.LogPoint;
 import net.rails.support.Support;
 import net.rails.support.worker.TokenWorker;
 import net.rails.support.worker.UserAgentWorker;
@@ -74,6 +75,7 @@ public abstract class Controller {
 			HttpServletResponse response, Route route) throws Exception {
 		super();
 		log = LoggerFactory.getLogger(getClass());
+		
 		this.config = config;
 		this.request = request;
 		this.response = response;
@@ -119,17 +121,19 @@ public abstract class Controller {
 			parseParams(request.getParameterMap());
 		}
 		
-		if (log.isDebugEnabled() || log.isInfoEnabled()) {
+		LogPoint.markWeb();
+		if (log.isDebugEnabled()) {
 			log.debug("Headers: {}",headers);
 			log.debug("UserAgent: {}",headers.get("user-agent"));
 			log.debug("Cookies: {}",cookies);
-			log.info("Controller: {}",route.getController());
-			log.info("Action: {}",route.getAction());
+			log.debug("Controller: {}",route.getController());
+			log.debug("Action: {}",route.getAction());
 			log.debug("Method: {}",request.getMethod());
 			log.debug("Ajax: {}",ajax);
-			log.info("Request Params: {}",params);
+			log.debug("Request Params: {}",params);
 			log.debug("Request Queies: {}",queies);
 		}
+		LogPoint.unmark();
 	}
 
 	/** 以下是私有方法 **/
