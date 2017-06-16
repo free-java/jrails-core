@@ -121,19 +121,25 @@ public abstract class Controller {
 			parseParams(request.getParameterMap());
 		}
 		
-		LogPoint.markWeb();
 		if (log.isDebugEnabled()) {
+			LogPoint.markWebHeader();
 			log.debug("Headers: {}",headers);
+			LogPoint.isMarkWebUserAgent();
 			log.debug("UserAgent: {}",headers.get("user-agent"));
+			LogPoint.markWebCookie();
 			log.debug("Cookies: {}",cookies);
+			LogPoint.markWebParams();
+			log.debug("Request Params: {}",params);
+			LogPoint.unmark();
+		}
+		
+		if (log.isDebugEnabled()) {
 			log.debug("Controller: {}",route.getController());
 			log.debug("Action: {}",route.getAction());
 			log.debug("Method: {}",request.getMethod());
 			log.debug("Ajax: {}",ajax);
-			log.debug("Request Params: {}",params);
 			log.debug("Request Queies: {}",queies);
 		}
-		LogPoint.unmark();
 	}
 
 	/** 以下是私有方法 **/

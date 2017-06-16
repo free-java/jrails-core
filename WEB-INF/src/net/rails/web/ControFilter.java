@@ -47,7 +47,7 @@ public final class ControFilter implements Filter {
 	}
 	
 	private void logInfo(HttpServletRequest request){
-		LogPoint.markWeb();
+		LogPoint.markWebUrl();
 		if(log.isDebugEnabled()){
 			log.debug("Remote Addr: {}",request.getRemoteAddr());
 			String qs = request.getQueryString();

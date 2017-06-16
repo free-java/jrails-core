@@ -49,7 +49,6 @@ public class ApplicationListener implements ServletContextListener {
 	public ApplicationListener() {
 		super();
 		log = LoggerFactory.getLogger(ApplicationListener.class);
-		LogPoint.markApp();
 	}
 
 	@Override

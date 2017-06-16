@@ -7,13 +7,17 @@ public final class LogPoint {
 
 	private final static Properties properties = new Properties();
 	public static String POINT_KEY = "log4j.jrails.point";
-	public static String APP = "log4j.jrails.app";
+	public static String YOUR = "log4j.jrails.your";
 	public static String SQL = "log4j.jrails.sql";
 	public static String SQL_CONN = "log4j.jrails.sql.conn";
 	public static String SQL_CACHE = "log4j.jrails.sql.cache";
 	public static String SQL_ROWS = "log4j.jrails.sql.rows";
 	public static String SQL_RESULT = "log4j.jrails.sql.result";
-	public static String WEB = "log4j.jrails.web";
+	public static String WEB_URL = "log4j.jrails.web.url";
+	public static String WEB_PARAMS = "log4j.jrails.web.params";
+	public static String WEB_HEADER = "log4j.jrails.web.header";
+	public static String WEB_USERAGENT = "log4j.jrails.web.useragent";
+	public static String WEB_COOKIE = "log4j.jrails.web.cookie";
 	public static String JOB_SYSTEM = "log4j.jrails.job.system";
 	public static String JOB_APP = "log4j.jrails.job.app";
 	
@@ -33,12 +37,12 @@ public final class LogPoint {
 		MDC.remove(POINT_KEY);
 	}
 	
-	public static boolean isMarkApp(){
+	public static boolean isMarkYour(){
 		String val = (String)MDC.get(POINT_KEY);
 		if(val == null){
 			return false;
 		}
-		return val.equals(APP);
+		return val.equals(YOUR);
 	}
 	
 	public static boolean isMarkSql(){
@@ -81,12 +85,44 @@ public final class LogPoint {
 		return val.equals(SQL_RESULT);
 	}
 	
-	public static boolean isMarkWeb(){
+	public static boolean isMarkWebUrl(){
 		String val = (String)MDC.get(POINT_KEY);
 		if(val == null){
 			return false;
 		}
-		return val.equals(WEB);
+		return val.equals(WEB_URL);
+	}
+	
+	public static boolean isMarkWebParams(){
+		String val = (String)MDC.get(POINT_KEY);
+		if(val == null){
+			return false;
+		}
+		return val.equals(WEB_PARAMS);
+	}
+	
+	public static boolean isMarkWebUserAgent(){
+		String val = (String)MDC.get(POINT_KEY);
+		if(val == null){
+			return false;
+		}
+		return val.equals(WEB_USERAGENT);
+	}
+	
+	public static boolean isMarkWebHeader(){
+		String val = (String)MDC.get(POINT_KEY);
+		if(val == null){
+			return false;
+		}
+		return val.equals(WEB_HEADER);
+	}
+	
+	public static boolean isMarkWebCookie(){
+		String val = (String)MDC.get(POINT_KEY);
+		if(val == null){
+			return false;
+		}
+		return val.equals(WEB_COOKIE);
 	}
 	
 	public static boolean isMarkJobSystem(){
@@ -105,8 +141,8 @@ public final class LogPoint {
 		return val.equals(JOB_APP);
 	}
 	
-	public static void markApp(){
-		mark(APP);
+	public static void markYour(){
+		mark(YOUR);
 	}
 	
 	public static void markSql(){
@@ -129,8 +165,20 @@ public final class LogPoint {
 		mark(SQL_RESULT);
 	}
 	
-	public static void markWeb(){
-		mark(WEB);
+	public static void markWebUrl(){
+		mark(WEB_URL);
+	}
+	
+	public static void markWebParams(){
+		mark(WEB_PARAMS);
+	}
+	
+	public static void markWebHeader(){
+		mark(WEB_HEADER);
+	}
+	
+	public static void markWebCookie(){
+		mark(WEB_COOKIE);
 	}
 	
 	public static void markJobSystem(){
