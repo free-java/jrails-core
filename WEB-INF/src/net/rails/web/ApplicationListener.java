@@ -3,8 +3,11 @@ package net.rails.web;
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.MalformedURLException;
+import java.sql.Driver;
+import java.sql.DriverManager;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -53,8 +56,19 @@ public class ApplicationListener implements ServletContextListener {
 
 	@Override
 	public void contextDestroyed(ServletContextEvent arg0) {
-		log.info("ApplicationListener Destroyed!");
+		log.info("ApplicationListener Destroying...");
 		shutdownScheduler();
+		try{
+			Enumeration<Driver> drivers = DriverManager.getDrivers();
+			while(drivers.hasMoreElements()){
+				Driver driver = drivers.nextElement();
+				log.info("Driver: " + driver);
+				DriverManager.deregisterDriver(driver);
+			}
+		}catch(Exception e){
+			log.error(e.getMessage(),e);
+		}
+		log.info("ApplicationListener Destroyed.");
 	}
 
 	@Override
