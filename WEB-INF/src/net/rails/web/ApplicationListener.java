@@ -38,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.rails.Define;
+import net.rails.active_record.Adapter;
 import net.rails.ext.AbsGlobal;
 import net.rails.log.LogPoint;
 import net.rails.support.Support;
@@ -60,12 +61,7 @@ public class ApplicationListener implements ServletContextListener {
 		log.info("ApplicationListener Destroying...");
 		shutdownScheduler();
 		try{
-			Enumeration<Driver> drivers = DriverManager.getDrivers();
-			while(drivers.hasMoreElements()){
-				Driver driver = drivers.nextElement();
-				log.info("Driver: " + driver);
-				DriverManager.deregisterDriver(driver);
-			}
+			Adapter.cleaupDataSource();
 		}catch(Exception e){
 			log.error(e.getMessage(),e);
 		}

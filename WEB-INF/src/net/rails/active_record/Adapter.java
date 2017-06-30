@@ -2,6 +2,8 @@ package net.rails.active_record;
 
 import java.lang.reflect.Method;
 import java.sql.Connection;
+import java.sql.Driver;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -12,17 +14,21 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
+import org.apache.commons.dbcp.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import net.rails.cache.Cache;
 import net.rails.ext.IndexMap;
+import net.rails.ext.Json;
 import net.rails.log.LogPoint;
 import net.rails.sql.Sql;
 import net.rails.sql.worker.CreateWorker;
@@ -36,7 +42,7 @@ import java.text.SimpleDateFormat;
 public class Adapter {
 	
 	private Logger log = LoggerFactory.getLogger(Adapter.class);	
-	private DataSource dataSource;
+//	private DataSource dataSource;
 
 	protected String model;
 	protected String tableName;
@@ -424,7 +430,7 @@ public class Adapter {
 	}
 	
 	public DataSource getDataSource(){
-		return dataSource;
+		return DATASOURCES.get(MODEL_DATASOURC_MAPS.get(model));
 	}
 	
 	public void setAutoCommit(boolean autoCommit){
@@ -441,7 +447,7 @@ public class Adapter {
 		if(isAutoCommit()){
 			log.debug("Open Connection");
 			LogPoint.unmark();
-			connection = dataSource.getConnection();
+			connection = getDataSource().getConnection();
 			connection.setAutoCommit(isAutoCommit());
 			return connection;
 		}else{
@@ -451,7 +457,7 @@ public class Adapter {
 				return CONNECTIONS.get(threadId);
 			}else{
 				log.debug("Open Transaction Connection");
-				connection = dataSource.getConnection();
+				connection = getDataSource().getConnection();
 				connection.setAutoCommit(isAutoCommit());
 				CONNECTIONS.put(threadId, connection);
 				LogPoint.unmark();
@@ -464,7 +470,7 @@ public class Adapter {
 		LogPoint.markSqlConn();
 		log.debug("Open Qyery Connection");
 		LogPoint.unmark();
-		return dataSource.getConnection();
+		return getDataSource().getConnection();
 	}
 	
 	private void closeQueryConnection(ResultSet result,PreparedStatement statement,Connection connection) {
@@ -556,23 +562,49 @@ public class Adapter {
 		}
 	}
 	
+	public final static Map<String,DataSource> DATASOURCES = new HashMap<String,DataSource>();
+	public final static Map<String,String> MODEL_DATASOURC_MAPS = new HashMap<String,String>(); 
+	
+	public synchronized static void cleaupDataSource() throws SQLException{
+		List<String> dsKeys = Support.map(DATASOURCES).keys();
+		for (Iterator<String> iterator = dsKeys.iterator(); iterator.hasNext();) {
+			BasicDataSource ds = (BasicDataSource)DATASOURCES.get(iterator.next());
+			ds.close();
+		}		
+		DATASOURCES.clear();
+		MODEL_DATASOURC_MAPS.clear();
+		Enumeration<Driver> drivers = DriverManager.getDrivers();
+		while(drivers.hasMoreElements()){
+			Driver driver = drivers.nextElement();
+			DriverManager.deregisterDriver(driver);
+		}
+	}
+	
 	private synchronized void initDataSource() {
 		LogPoint.markSqlConn();
+		DataSource dataSource = null;
 		try {
-			if(dbcnf.containsKey("jndi")){
-				Context cxt = new InitialContext();
-			    dataSource = (DataSource)cxt.lookup(dbcnf.get("jndi").toString());
-			}else{
-				final Class<DataSource> c = (Class<DataSource>) Class.forName(dbcnf.get("datasource").toString());
-				dataSource = c.newInstance();
-				Method mtd = c.getDeclaredMethod("setDriverClassName", String.class);
-				mtd.invoke(dataSource,dbcnf.get("driver"));
-				mtd = c.getDeclaredMethod("setUrl", String.class);
-				mtd.invoke(dataSource,dbcnf.get("url")); 
-				mtd = c.getDeclaredMethod("setUsername", String.class);
-				mtd.invoke(dataSource, dbcnf.get("username"));
-				mtd = c.getDeclaredMethod("setPassword", String.class);
-				mtd.invoke(dataSource,dbcnf.get("password"));
+			if(!MODEL_DATASOURC_MAPS.containsKey(model)){
+				String dsKey = Support.code().md5(new Json(dbcnf).generate());
+				if(!MODEL_DATASOURC_MAPS.containsKey(dsKey)){
+					if(dbcnf.containsKey("jndi")){
+						Context cxt = new InitialContext();
+					    dataSource = (DataSource)cxt.lookup(dbcnf.get("jndi").toString());
+					}else{
+						final Class<DataSource> c = (Class<DataSource>) Class.forName(dbcnf.get("datasource").toString());
+						dataSource = c.newInstance();
+						Method mtd = c.getDeclaredMethod("setDriverClassName", String.class);
+						mtd.invoke(dataSource,dbcnf.get("driver"));
+						mtd = c.getDeclaredMethod("setUrl", String.class);
+						mtd.invoke(dataSource,dbcnf.get("url")); 
+						mtd = c.getDeclaredMethod("setUsername", String.class);
+						mtd.invoke(dataSource, dbcnf.get("username"));
+						mtd = c.getDeclaredMethod("setPassword", String.class);
+						mtd.invoke(dataSource,dbcnf.get("password"));
+					}
+					MODEL_DATASOURC_MAPS.put(model, dsKey);
+					DATASOURCES.put(dsKey, dataSource);
+				}
 			}
 		}catch (Exception e) {
 			log.error(e.getMessage(),e);
