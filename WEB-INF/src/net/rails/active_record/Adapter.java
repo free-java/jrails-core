@@ -556,7 +556,7 @@ public class Adapter {
 		}
 	}
 	
-	protected void initDataSource() {
+	private synchronized void initDataSource() {
 		LogPoint.markSqlConn();
 		try {
 			if(dbcnf.containsKey("jndi")){
