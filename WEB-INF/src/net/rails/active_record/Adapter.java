@@ -14,7 +14,6 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
-import org.apache.commons.dbcp.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,8 +41,10 @@ import java.text.SimpleDateFormat;
 public class Adapter {
 	
 	private Logger log = LoggerFactory.getLogger(Adapter.class);	
-//	private DataSource dataSource;
 
+	public static Map<String,DataSource> DATASOURCES;
+	public static Map<String,String> MODEL_DATASOURC_MAPS; 
+	
 	protected String model;
 	protected String tableName;
 	protected String primaryKey;
@@ -61,6 +62,8 @@ public class Adapter {
 	protected static Map<Long,Connection> CONNECTIONS;
 	
 	static{
+		DATASOURCES = new HashMap<String,DataSource>();
+		MODEL_DATASOURC_MAPS = new HashMap<String,String>(); 
 		COLUMN_TYPES = new IndexMap<String,Map<String,String>>();
 		COLUMN_CLASSES = new IndexMap<String,Map<String,String>>();
 		COLUMN_NAMES = new IndexMap<String,List<String>>();
@@ -561,15 +564,14 @@ public class Adapter {
 			closeTransactionConnection();
 		}
 	}
-	
-	public final static Map<String,DataSource> DATASOURCES = new HashMap<String,DataSource>();
-	public final static Map<String,String> MODEL_DATASOURC_MAPS = new HashMap<String,String>(); 
-	
-	public synchronized static void cleaupDataSource() throws SQLException{
+		
+	public synchronized static void cleaupDataSource() throws Exception{
 		List<String> dsKeys = Support.map(DATASOURCES).keys();
 		for (Iterator<String> iterator = dsKeys.iterator(); iterator.hasNext();) {
-			BasicDataSource ds = (BasicDataSource)DATASOURCES.get(iterator.next());
-			ds.close();
+			DataSource ds = DATASOURCES.get(iterator.next());
+			Class c = ds.getClass();
+			Method mtd = c.getDeclaredMethod("close");
+			mtd.invoke(ds);
 		}		
 		DATASOURCES.clear();
 		MODEL_DATASOURC_MAPS.clear();

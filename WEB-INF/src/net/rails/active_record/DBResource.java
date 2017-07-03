@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.rails.ext.AbsGlobal;
-import net.rails.ext.Json;
 import net.rails.support.Support;
 import net.rails.support.worker.AbsConfigWorker;
 
