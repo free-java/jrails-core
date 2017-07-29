@@ -570,7 +570,7 @@ public class Adapter {
 		for (Iterator<String> iterator = dsKeys.iterator(); iterator.hasNext();) {
 			DataSource ds = DATASOURCES.get(iterator.next());
 			Class c = ds.getClass();
-			Method mtd = c.getDeclaredMethod("close");
+			Method mtd = c.getMethod("close");
 			mtd.invoke(ds);
 		}		
 		DATASOURCES.clear();
@@ -588,7 +588,7 @@ public class Adapter {
 		try {
 			if(!MODEL_DATASOURC_MAPS.containsKey(model)){
 				String dsKey = Support.code().md5(new Json(dbcnf).generate());
-				if(!MODEL_DATASOURC_MAPS.containsKey(dsKey)){
+				if(!DATASOURCES.containsKey(dsKey)){
 					if(dbcnf.containsKey("jndi")){
 						Context cxt = new InitialContext();
 					    dataSource = (DataSource)cxt.lookup(dbcnf.get("jndi").toString());
