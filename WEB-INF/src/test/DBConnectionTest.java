@@ -12,6 +12,7 @@ import javax.xml.bind.DatatypeConverter;
 import org.apache.commons.io.FileUtils;
 
 import app.model.Account;
+import app.model.Role;
 import net.rails.active_record.DBResource;
 import net.rails.ciphertext.Ciphertext;
 import net.rails.ciphertext.Ciphertext.DESWorker;
@@ -53,16 +54,20 @@ public class DBConnectionTest
     {
     	try{
         	g.setLocale("default");
-        	for(int i = 0;i < 100000;i++){
+        	for(int i = 0;i < 1;i++){
         		try{
             		Query q = new Query(new Account(g));
                 	Account a = q.first();
+                	
+        			Query q1 = new Query(new Role(g));
+                	Role b = q1.first();
 //            		Account a = new Account(g);
 //                	a.setId(Support.code().id());
 //                	a.put("name","jack");
 //                	a.put("age","22");
 //                	a.onSave();
-                	System.out.println( i + "-"+ a);
+                	System.out.println(a);
+                	System.out.println(b);
         		}catch(Exception e){
         			e.printStackTrace();
         		}

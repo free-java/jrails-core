@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <project name="jrails-core" default="build" basedir=".">
 	<property environment="env" />
-	<property name="jr.version" value="1.0" />
+	<property name="jr.version" value="201708301303" />
 	<property name="jr.charset" value="UTF-8" />
 	<property name="jr.root" location="../" />
 	<property name="jr.docs" value="${jr.root}/public/docs" />
@@ -88,7 +88,7 @@
 	    <delete dir="/src/development/free-core-lib/${jr.version}" />
 	    <mkdir dir="/src/development/private-java/jrails-designer/WEB-INF/lib" />
 	    <mkdir dir="/src/development/free-core-lib/${jr.version}" />
-	
+	    <!-- 
 		<copy file="${jr.core.jar}" todir="/src/development/private-java/jrails-designer/WEB-INF/lib"/>
 		<copy file="${jr.core.jar}" todir="/src/development/free-core-lib/${jr.version}"/>
 		
@@ -99,7 +99,7 @@
 		<copy todir="/src/development/free-core-lib/${jr.version}"> 
 		  <fileset dir="${jr.lib}"/>
         </copy>
-  
+   -->
 	</target>
 
 </project>

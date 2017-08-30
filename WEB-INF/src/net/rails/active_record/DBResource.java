@@ -66,6 +66,7 @@ public class DBResource {
 	}
 	
 	protected String getEnv(String model){
+		String hostname = Support.env().getHostname();
 		String key = "env";
 		Map<String,Object> modcnf = Support.config().getModels().get(model);
 		Object value = null;
@@ -73,23 +74,16 @@ public class DBResource {
 			value = modcnf.get(key);
 			if(value instanceof Map){
 				Map<String,String> o = (Map<String,String>)value;
-				value = o.get(getHostname());
+				value = o.get(hostname);
 			}
 		}else{
 			value = Support.env().getEnv();
 		}
-		return (String)value;
-	}
-	
-	private String getHostname() {
-		try {
-			InetAddress addr;
-			addr = InetAddress.getLocalHost();
-			return addr.getHostName();
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-			return null;
+		if(Support.object(value).blank()){
+			log.error("Local Hostname is {}.",hostname);
+			log.error("No config on env.yml");
 		}
+		return (String)value;
 	}
 	
 }

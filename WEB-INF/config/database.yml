@@ -3,11 +3,11 @@ Development:
     family: Mysql
     username: "root"
     driver: 'org.gjt.mm.mysql.Driver'
-    password: "password"
-    url: "jdbc:mysql://localhost:3306/appdb?characterEncoding=utf8"
+    password: "dev2016"
+    url: "jdbc:mysql://localhost:3306/jrd_db?characterEncoding=utf8"
     datasource: org.apache.commons.dbcp.BasicDataSource
     quote: "`keyword`"
-    schema: appdb
+    schema: jrd_db
     prefix: ~
     formats:
       datetime: 'yyyy-MM-dd HH:mm:ss.SSS'
@@ -17,11 +17,11 @@ Development:
     family: Mysql
     username: "root"
     driver: 'org.gjt.mm.mysql.Driver'
-    password: "password"
-    url: "jdbc:mysql://localhost:3306/appdb?characterEncoding=utf8"
+    password: "dev2016"
+    url: "jdbc:mysql://localhost:3306/jrd_db?characterEncoding=utf8"
     datasource: org.apache.commons.dbcp.BasicDataSource
     quote: "`keyword`"
-    schema: appdb
+    schema: jrd_db
     prefix: ~
     formats:
       datetime: 'yyyy-MM-dd HH:mm:ss.SSS'

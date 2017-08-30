@@ -588,7 +588,9 @@ public class Adapter {
 		try {
 			if(!MODEL_DATASOURC_MAPS.containsKey(model)){
 				String dsKey = Support.code().md5(new Json(dbcnf).generate());
-				if(!DATASOURCES.containsKey(dsKey)){
+				if(DATASOURCES.containsKey(dsKey)){
+					MODEL_DATASOURC_MAPS.put(model, dsKey);
+				}else{
 					if(dbcnf.containsKey("jndi")){
 						Context cxt = new InitialContext();
 					    dataSource = (DataSource)cxt.lookup(dbcnf.get("jndi").toString());

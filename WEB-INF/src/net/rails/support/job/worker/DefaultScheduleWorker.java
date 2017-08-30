@@ -1,6 +1,5 @@
 package net.rails.support.job.worker;
 
-import java.net.InetAddress;
 import java.util.List;
 import org.quartz.JobListener;
 import org.quartz.TriggerListener;
@@ -8,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.rails.ext.AbsGlobal;
+import net.rails.support.Support;
 
 public abstract class DefaultScheduleWorker {
 
@@ -25,14 +25,7 @@ public abstract class DefaultScheduleWorker {
 	}
 
 	protected String getHostname() {
-		try {
-			InetAddress addr;
-			addr = InetAddress.getLocalHost();
-			return addr.getHostName();
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-			return null;
-		}
+		return Support.env().getHostname();
 	}
 
 }
